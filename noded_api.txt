@@ -1,0 +1,21 @@
+Node daemon api used by nodectl and web possibly:
+
+GET /api/name
+returns node name
+
+POST /api/setname newname=...
+sets new node name
+
+POST /api/docommand cmd=<cmd>
+Executes given command
+
+POST /api/sendcommand target=<node name> cmd=<cmd>
+Sends given command to given node
+
+GET /api/nodes
+Returns known nodes list
+
+TODO:
+  Some verifcation, a passphrase?
+
+
