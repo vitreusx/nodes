@@ -44,5 +44,5 @@ def home():
     return app.send_static_file('index.html')
 
 if __name__ == '__main__':
-     con = sql.connect(config.db_path)
-     app.run(port = config.port)
+    con = sql.connect(config.db_path)
+    app.run(port = config.port)
