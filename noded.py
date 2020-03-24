@@ -13,7 +13,6 @@ import requests
 import config
 import logging
 
-
 app = Flask(__name__, static_folder='data/html')
 
 # Print server output to file
@@ -42,20 +41,20 @@ def on_api_sendcommand():
 @app.route('/api/nodes', methods = ['GET'])
 def on_api_nodes():
     # Send known nodes somehow, Json? Split by some character?
-    return "YES"
+    return jsonify(config.known_nodes), 200
 
 @app.route('/api/connect', methods = ['POST'])
 def on_api_connect():
     new_node = dict()
     new_node['ip'] = request.environ.get('REMOTE_ADDR')
-    new_node['port'] = request.vlaues.get('port')
+    new_node['port'] = request.values.get('port')
     new_node['name'] = request.values.get('name')
 
     if None in new_node.values():
         return "Missing Parameter", 201
 
     for node in config.known_nodes: # This node sends it also to itself. Is it ok?
-        result = requests.post(f"http://{node['ip']}:{node['port']}/api/addnode", data=node)
+        result = requests.post(f"http://{node['ip']}:{node['port']}/api/addnode", data=new_node)
         # TODO what if this fails?
 
     return "ADDED", 200
