@@ -2,6 +2,9 @@
 nodectl is a command line interface for nodedaemon
 """
 import requests 
+from multiprocessing import Process
+from noded import app
+import config
 
 nodedAddress = "http://localhost:5000"
 
@@ -17,9 +20,14 @@ def command_send(command, name):
     return
 
 def connect_to(node):
-    result = request.post(f"{node['ip']}:{node['port']}/api/connect}", data={'port':config.port, 'name':config.name})
+    result = request.post(f"{node['ip']}:{node['port']}/api/connect", data={'port':config.port, 'name':config.name})
     
 if __name__ == '__main__':
+
+    # starting daemon server
+    server = Process(target=app.run, kwargs={'port':config.port}, daemon=True)
+    server.start()
+
     print("Connecting to noded...");
     nameRequest = requests.get(f"{nodedAddress}/api/name")
     
