@@ -5,16 +5,21 @@ Daemon handles node stuff and serves web interface
 """
 
 from flask import Flask, request;
+from flask import jsonify
 import sqlite3 as sql;
 import click
 from flask.cli import AppGroup
 import requests
 import config
+import logging
 
 
 app = Flask(__name__, static_folder='data/html')
-# API Requests
 
+# Print server output to file
+logging.basicConfig(filename='server_logs.log', level=logging.DEBUG)
+
+# API Requests
 @app.route('/api/name', methods = ['GET'])
 def on_api_name():
     return config.nodeName;
@@ -38,6 +43,39 @@ def on_api_sendcommand():
 def on_api_nodes():
     # Send known nodes somehow, Json? Split by some character?
     return "YES"
+
+@app.route('/api/connect', methods = ['POST'])
+def on_api_connect():
+    new_node = dict()
+    new_node['ip'] = request.environ.get('REMOTE_ADDR')
+    new_node['port'] = request.vlaues.get('port')
+    new_node['name'] = request.values.get('name')
+
+    if None in new_node.values():
+        return "Missing Parameter", 201
+
+    for node in config.known_nodes: # This node sends it also to itself. Is it ok?
+        result = requests.post(f"http://{node['ip']}:{node['port']}/api/addnode", data=node)
+        # TODO what if this fails?
+
+    return "ADDED", 200
+
+@app.route('/api/addnode', methods = ['POST'])
+def on_api_addnode():
+    # TODO authentication
+    new_node = dict()
+    new_node['ip'] = request.values.get('ip')
+    new_node['port'] = request.values.get('port')
+    new_node['name'] = request.values.get('name')
+    
+    # This check is not needed when authentication will be added
+    if None in new_node.values():
+        return "Missing Parameter", 201
+
+    if new_node not in config.known_nodes:
+        config.known_nodes.append(new_node)
+    
+    return "ADDED", 200
 
 @app.route('/') # Serves web interface
 def home():

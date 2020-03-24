@@ -16,6 +16,9 @@ def command_send(command, name):
     sendRequest = requests.post(f"{nodedAddress}/api/sendcommand", data={'cmd': command, 'target': name})
     return
 
+def connect_to(node):
+    result = request.post(f"{node['ip']}:{node['port']}/api/connect}", data={'port':config.port, 'name':config.name})
+    
 if __name__ == '__main__':
     print("Connecting to noded...");
     nameRequest = requests.get(f"{nodedAddress}/api/name")
