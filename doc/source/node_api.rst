@@ -1,9 +1,9 @@
 Node API
 ========
 
-Every Aurora node has http server running in the background. This
+Each Aurora node has an http server running in the background. This
 server is responsible for communication with other nodes and executing
-commands in its own node. Server provides following functionalities.
+commands in its own node. The server provides the following functionalities.
 
 
 .. function:: home() /
