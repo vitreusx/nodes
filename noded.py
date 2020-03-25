@@ -27,21 +27,37 @@ def on_api_name():
 @app.route('/api/docommand', methods = ['POST'])
 def on_api_docommand():
     command = request.values.get('cmd')
+
+    if command is None:
+        return "Missing parameter", 400
+    
     print("Doing command " + str(command))
 
     if command in config.allowed_scripts:
         os.system(f"python3 scripts/{command}")
         return "OK", 200
     else:
-        return "Script not allowed", 422
+        return "Script not allowed", 403
 
 @app.route('/api/sendcommand', methods = ['POST'])
 def on_api_sendcommand():
     command = request.values.get('cmd')
     target = request.values.get('target') 
-    targetNode = [n for n in config.known_nodes if n['name'] == target][0]
+
+    if command is None or target is None:
+        return "Missing parameter", 400
+
+    try:
+        targetNode = [n for n in config.known_nodes if n['name'] == target][0]
+    except IndexError:
+        return "Bad target", 400
+    
     doRequest = requests.post(f"http://{targetNode['ip']}:{targetNode['port']}/api/docommand", data={'cmd': command})
-    return "I dont know how to do that"
+
+    if doRequest.status_code != 200:
+        return "Sending command falied", doRequest.status_code
+    
+    return "Message sent", 200
 
 @app.route('/api/nodes', methods = ['GET'])
 def on_api_nodes():
