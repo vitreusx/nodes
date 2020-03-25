@@ -20,7 +20,7 @@ class TestNodeDaemon(unittest.TestCase):
 
         
     def testDoCommand(self):
-        response = requests.post(f"http://localhost:{config.port}/api/docommand", data={'cmd':'correct command'}) # TODO change it to actual correct command when checking will be added
+        response = requests.post(f"http://localhost:{config.port}/api/docommand", data={'cmd':'script_a.py'})
 
         self.assertEqual(response.status_code, 200)
         
@@ -28,11 +28,11 @@ class TestNodeDaemon(unittest.TestCase):
     def testDoCommandMissingParameter(self):
         response = requests.post(f"http://localhost:{config.port}/api/docommand", data={})
 
-        self.assertEqual(response.status_code, 201) # missing parameter
+        self.assertEqual(response.status_code, 400) # missing parameter
 
 
-    def testSendComand(self):
-        response = requests.post(f"http://localhost:{config.port}/api/sendcommand", data={'cmd':"correct command", 'target':"nodeA"})
+    def testSendCommand(self):
+        response = requests.post(f"http://localhost:{config.port}/api/sendcommand", data={'cmd':"script_a.py", 'target':"nodeA"})
             
         self.assertEqual(response.status_code, 200)
 
@@ -40,14 +40,13 @@ class TestNodeDaemon(unittest.TestCase):
     def testSendComandMissingParameter(self):
         response = requests.post(f"http://localhost:{config.port}/api/sendcommand")
             
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 400)
 
         
     def testSendComandBadTarget(self):
         response = requests.post(f"http://localhost:{config.port}/api/sendcommand", data={'cmd':"correct command", 'target':"not existing node"})
 
-        self.assertNotEqual(response.status_code, 200) # TODO What code should be returned?
-        self.assertNotEqual(response.status_code, 500) 
+        self.assertEqual(response.status_code, 400)
 
 
     def testConnect(self):
