@@ -15,6 +15,7 @@ Aurora respects your privacy unlike other solutions like Alexa.
 
    usage_guide.rst
    node_api
+   speechrecognition
 
 Indices and tables
 ==================
