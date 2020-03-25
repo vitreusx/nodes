@@ -14,6 +14,7 @@ Aurora respects your privacy unlike other solutions like Alexa.
    :maxdepth: 2
 
    usage_guide.rst
+   node_api
 
 Indices and tables
 ==================
