@@ -12,6 +12,7 @@ from flask.cli import AppGroup
 import requests
 import config
 import logging
+import os
 
 app = Flask(__name__, static_folder='data/html')
 
@@ -27,8 +28,12 @@ def on_api_name():
 def on_api_docommand():
     command = request.values.get('cmd')
     print("Doing command " + str(command))
-    # Do the command
-    return "OK"
+
+    if command in config.allowed_scripts:
+        os.system(f"python3 scripts/{command}")
+        return "OK", 200
+    else:
+        return "Script not allowed", 422
 
 @app.route('/api/sendcommand', methods = ['POST'])
 def on_api_sendcommand():
