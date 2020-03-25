@@ -1,0 +1,5 @@
+*__pycache__*
+env/
+data/noded_db.db
+server_logs.log
+doc/build/
