@@ -1,8 +1,8 @@
 Speech recognition
 ==================
 
-Speech recognition is very important part of Aurora project.
-We have tried following libraries for speech recognition:
+Speech recognition is a very important part of the Aurora project.
+We have tried the following libraries for speech recognition:
 
 * Google Cloud Speech
 * CMU Sphinx

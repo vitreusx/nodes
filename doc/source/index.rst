@@ -8,7 +8,7 @@ Welcome to Aurora's documentation!
 
 Aurora is your smart home voice assistant of the future.
 It's a network of nodes positioned around your house that listens to your voice commands and does whatever you program it to do.
-Aurora respects your privacy unlike other solutions like Alexa
+Aurora respects your privacy unlike other solutions such as Alexa.
 
 .. toctree::
    :maxdepth: 2
