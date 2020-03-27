@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Node API &#8212; Aurora  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Speech recognition" href="speechrecognition.html" />
+    <link rel="prev" title="Usage Guide" href="usage_guide.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="node-api">
+<h1>Node API<a class="headerlink" href="#node-api" title="Permalink to this headline">¶</a></h1>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+Each Aurora node has an http server running in the background. This
+=======
+Each Aurora node has a http server running in the background. This
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; f9ecdf2b6ede3c986315ebed6208ed1e85d1770c
+server is responsible for communication with other nodes and executing
+commands in its own node. The server provides the following functionalities.</p>
+<dl class="function">
+<dt>
+<code class="sig-name descname">home() /</code></dt>
+<dd><p>Settings page(not implemented yet)</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">on_api_name() /api/name</code></dt>
+<dd><p>Request requires no parameters</p>
+<p>Returns name of node in plaintext</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">on_api_docommand /api/docommand</code></dt>
+<dd><p>Runs given command in requested node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cmd</strong> – command to run</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>200 - Command ran succesfully</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>400 - Missing parameter</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>403 - Command not allowed (see allowed commands)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">on_api_sendcommand() /api/sendcommand</code></dt>
+<dd><p>Sends request for another node to /api/docommand</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cmd</strong> – command to be sent</p></li>
+<li><p><strong>target</strong> – name of target node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>200</em> - When command was sent succesfully, and other node
+replied with code <em>200</em> to <em>docommand</em> request</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>400</em> - Some paramerers are missing or <em>target</em> is not
+in <em>known_nodes</em> of sender (see known_nodes)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>other code</em> - If command was sent succesfully, but
+<em>docommand</em> request failed. This fail status code
+is returned</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">on_api_nodes() /api/nodes</code></dt>
+<dd><p>Returns list of known nodes in json (see known nodes)</p>
+<p>No parameters are required</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>200</em> - Returns list of known nodes as json string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">on_api_connect() /api/connect</code></dt>
+<dd><p>Connects current node to network requested node is in.
+Adds new node to every other node’s <em>known_nodes</em> list
+using <em>/api/addnode</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>port</strong> – Port number <em>sender</em> node is listening on</p></li>
+<li><p><strong>name</strong> – name of sender node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>200</em> - Node connected succesfully</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>400</em> - Missing parameter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">on_api_addnode() /api/addnode</code></dt>
+<dd><p>Adds new node to known_nodes list. This method should be available
+only for trusted nodes. (Authentication not implemented yet)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ip</strong> – IPv4 address of new node</p></li>
+<li><p><strong>port</strong> – port number of new node</p></li>
+<li><p><strong>name</strong> – name of new node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>200</em> - When succesfully added new node</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>400</em> - Missing parameter</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Aurora</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage_guide.html">Usage Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Node API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="speechrecognition.html">Speech recognition</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="usage_guide.html" title="previous chapter">Usage Guide</a></li>
+      <li>Next: <a href="speechrecognition.html" title="next chapter">Speech recognition</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, ..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/node_api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
