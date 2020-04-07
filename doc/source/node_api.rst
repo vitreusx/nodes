@@ -1,11 +1,7 @@
 Node API
 ========
 
-<<<<<<< HEAD
 Each Aurora node has an http server running in the background. This
-=======
-Each Aurora node has a http server running in the background. This
->>>>>>> f9ecdf2b6ede3c986315ebed6208ed1e85d1770c
 server is responsible for communication with other nodes and executing
 commands in its own node. The server provides the following functionalities.
 

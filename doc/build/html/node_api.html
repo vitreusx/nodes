@@ -34,27 +34,23 @@
             
   <div class="section" id="node-api">
 <h1>Node API<a class="headerlink" href="#node-api" title="Permalink to this headline">¶</a></h1>
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-Each Aurora node has an http server running in the background. This
-=======
-Each Aurora node has a http server running in the background. This
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; f9ecdf2b6ede3c986315ebed6208ed1e85d1770c
+<p>Each Aurora node has an http server running in the background. This
 server is responsible for communication with other nodes and executing
 commands in its own node. The server provides the following functionalities.</p>
-<dl class="function">
+<dl class="py function">
 <dt>
 <code class="sig-name descname">home() /</code></dt>
 <dd><p>Settings page(not implemented yet)</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt>
 <code class="sig-name descname">on_api_name() /api/name</code></dt>
 <dd><p>Request requires no parameters</p>
 <p>Returns name of node in plaintext</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt>
 <code class="sig-name descname">on_api_docommand /api/docommand</code></dt>
 <dd><p>Runs given command in requested node</p>
@@ -74,7 +70,7 @@ commands in its own node. The server provides the following functionalities.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt>
 <code class="sig-name descname">on_api_sendcommand() /api/sendcommand</code></dt>
 <dd><p>Sends request for another node to /api/docommand</p>
@@ -101,7 +97,7 @@ is returned</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt>
 <code class="sig-name descname">on_api_nodes() /api/nodes</code></dt>
 <dd><p>Returns list of known nodes in json (see known nodes)</p>
@@ -113,7 +109,7 @@ is returned</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt>
 <code class="sig-name descname">on_api_connect() /api/connect</code></dt>
 <dd><p>Connects current node to network requested node is in.
@@ -135,7 +131,7 @@ using <em>/api/addnode</em>.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt>
 <code class="sig-name descname">on_api_addnode() /api/addnode</code></dt>
 <dd><p>Adds new node to known_nodes list. This method should be available
@@ -217,7 +213,7 @@ only for trusted nodes. (Authentication not implemented yet)</p>
       &copy;2020, ..
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

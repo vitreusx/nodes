@@ -11,7 +11,9 @@ allowed_scripts = [
     "script_b.py",
 ]
 
-
 nodeName = "nodeA"
 port = 5000
 
+voice_coms = {
+    'play Mozart': 'mozart.py'
+}
