@@ -1,11 +1,6 @@
 Speech recognition
 ==================
 
-Speech recognition is a very important part of the Aurora project.
-We have tried the following libraries for speech recognition:
+Alongside the network-related part of `noded` is launched a service for recognizing phrases and parsing them. Phrases are placed (at this point in time) in `config.py` in the `voice_coms` variable (phrase to Python script). Then, if given phrase is recognized, the associated script is executed.
 
-* Google Cloud Speech
-* CMU Sphinx
-
-Now our application is still not developed enough to decide which of
-them better suits our needs. Further tests are required.
+The parsing is provided, as of now, by a cloud service interfaced through `speechrecognition` package.

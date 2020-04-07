@@ -33,14 +33,8 @@
             
   <div class="section" id="speech-recognition">
 <h1>Speech recognition<a class="headerlink" href="#speech-recognition" title="Permalink to this headline">¶</a></h1>
-<p>Speech recognition is a very important part of the Aurora project.
-We have tried the following libraries for speech recognition:</p>
-<ul class="simple">
-<li><p>Google Cloud Speech</p></li>
-<li><p>CMU Sphinx</p></li>
-</ul>
-<p>Now our application is still not developed enough to decide which of
-them better suits our needs. Further tests are required.</p>
+<p>Alongside the network-related part of <cite>noded</cite> is launched a service for recognizing phrases and parsing them. Phrases are placed (at this point in time) in <cite>config.py</cite> in the <cite>voice_coms</cite> variable (phrase to Python script). Then, if given phrase is recognized, the associated script is executed.</p>
+<p>The parsing is provided, as of now, by a cloud service interfaced through <cite>speechrecognition</cite> package.</p>
 </div>
 
 
@@ -100,7 +94,7 @@ them better suits our needs. Further tests are required.</p>
       &copy;2020, ..
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

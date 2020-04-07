@@ -13,6 +13,8 @@ import requests
 import config
 import logging
 import os
+import speech_recognition as sr
+from multiprocessing import Process
 
 app = Flask(__name__, static_folder='data/html')
 
@@ -101,6 +103,32 @@ def on_api_addnode():
 def home():
     return app.send_static_file('index.html')
 
+cloud_cred = open('google-cloud.json').read()
+
+def cb(rec, audio):
+    try:
+        command = rec.recognize_google_cloud(audio, credentials_json=cloud_cred).strip()
+        print(command)
+        if command in config.voice_coms:
+            script = config.voice_coms[command]
+            os.system(f"python3 scripts/{script}")
+    except:
+        pass
+
+def voice_thread_fn():
+    rec = sr.Recognizer()
+    mic = sr.Microphone()
+
+    with mic as src:
+        rec.adjust_for_ambient_noise(src, duration=1)
+
+    while True:
+        with mic as src:
+            audio = rec.listen(src, phrase_time_limit=5)
+            cb(rec, audio)
+
 if __name__ == '__main__':
     con = sql.connect(config.db_path)
+    voice_thr = Process(target=voice_thread_fn)
+    voice_thr.start()
     app.run(port = config.port)
