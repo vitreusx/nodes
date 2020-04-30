@@ -6,15 +6,15 @@ class NodeManager:
     known_nodes = []
     node_port = 4321
 
-    text_commands = []
-    voice_commands = []
+    commands = []
 
     recognize_voice = False
 
     def __init__(self):
         self.nodeName = config.nodeName
         self.known_nodes = config.known_nodes
-        self.allowed_scripts = config.allowed_scripts
+        self.node_port = config.port
+        self.commands = config.commands
         self.recognize_voice = config.recognize_voice
 
     # Name
@@ -45,30 +45,17 @@ class NodeManager:
         known_nodes = [node for node in known_nodes if node['name'] != node_name]
 
     # Commands
-    def do_text_command(self, command):
+    def do_command(self, command):
         result = False
-        for (voice_command, script) in self.text_commands:
-            if(voice_command == command):
-                os.system(f"python3 scripts/{script}")
-                result = True
-
-        return result
-                
-
-    def do_voice_command(self, command):
-        result = False
-        for (voice_command, script) in self.voice_commands:
+        for (voice_command, script) in self.commands:
             if(voice_command == command):
                 os.system(f"python3 scripts/{script}")
                 result = True
 
         return result
 
-    def get_text_commands(self):
-            return self.text_commands
-
-    def get_voice_commands(self):
-            return self.voice_commands
+    def get_commands(self):
+            return self.commands
 
     # Voice
     def should_recoginze_voice(self):

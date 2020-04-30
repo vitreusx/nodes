@@ -38,7 +38,7 @@ def on_api_docommand():
     
     print("Doing command " + str(command))
 
-    if nodeManager.do_text_command(command):
+    if nodeManager.do_command(command):
         return "OK", 200
     else:
         return "Script not allowed", 403
@@ -108,7 +108,7 @@ def cb(rec, audio):
     try:
         command = rec.recognize_google_cloud(audio, credentials_json=cloud_cred).strip()
         print(command)
-        nodeManager.do_voice_command(command)
+        nodeManager.do_command(command)
 
     except:
         pass
