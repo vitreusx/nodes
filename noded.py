@@ -15,6 +15,9 @@ import logging
 import os
 import speech_recognition as sr
 from multiprocessing import Process
+from nodemanager import NodeManager;
+
+nodeManager = NodeManager()
 
 app = Flask(__name__, static_folder='data/html')
 
@@ -24,7 +27,7 @@ logging.basicConfig(filename='server_logs.log', level=logging.DEBUG)
 # API Requests
 @app.route('/api/name', methods = ['GET'])
 def on_api_name():
-    return config.nodeName;
+    return nodeManager.get_name()
 
 @app.route('/api/docommand', methods = ['POST'])
 def on_api_docommand():
@@ -35,8 +38,7 @@ def on_api_docommand():
     
     print("Doing command " + str(command))
 
-    if command in config.allowed_scripts:
-        os.system(f"python3 scripts/{command}")
+    if nodeManager.do_text_command(command):
         return "OK", 200
     else:
         return "Script not allowed", 403
@@ -50,10 +52,10 @@ def on_api_sendcommand():
         return "Missing parameter", 400
 
     try:
-        targetNode = [n for n in config.known_nodes if n['name'] == target][0]
+        targetNode = [n for n in nodeManager.get_known_nodes() if n['name'] == target][0]
     except IndexError:
         return "Bad target", 400
-    
+
     doRequest = requests.post(f"http://{targetNode['ip']}:{targetNode['port']}/api/docommand", data={'cmd': command})
 
     if doRequest.status_code != 200:
@@ -63,8 +65,7 @@ def on_api_sendcommand():
 
 @app.route('/api/nodes', methods = ['GET'])
 def on_api_nodes():
-    # Send known nodes somehow, Json? Split by some character?
-    return jsonify(config.known_nodes), 200
+    return jsonify(nodeManager.get_known_nodes()), 200
 
 @app.route('/api/connect', methods = ['POST'])
 def on_api_connect():
@@ -76,7 +77,7 @@ def on_api_connect():
     if None in new_node.values():
         return "Missing Parameter", 201
 
-    for node in config.known_nodes: # This node sends it also to itself. Is it ok?
+    for node in nodeManager.get_known_nodes(): # This node sends it also to itself. Is it ok?
         result = requests.post(f"http://{node['ip']}:{node['port']}/api/addnode", data=new_node)
         # TODO what if this fails?
 
@@ -94,9 +95,7 @@ def on_api_addnode():
     if None in new_node.values():
         return "Missing Parameter", 201
 
-    if new_node not in config.known_nodes:
-        config.known_nodes.append(new_node)
-    
+    nodeManager.add_known_node(new_node['name'], new_node['ip'], new_node['port'])
     return "ADDED", 200
 
 @app.route('/') # Serves web interface
@@ -109,9 +108,8 @@ def cb(rec, audio):
     try:
         command = rec.recognize_google_cloud(audio, credentials_json=cloud_cred).strip()
         print(command)
-        if command in config.voice_coms:
-            script = config.voice_coms[command]
-            os.system(f"python3 scripts/{script}")
+        nodeManager.do_voice_command(command)
+
     except:
         pass
 
@@ -128,7 +126,6 @@ def voice_thread_fn():
             cb(rec, audio)
 
 if __name__ == '__main__':
-    con = sql.connect(config.db_path)
     voice_thr = Process(target=voice_thread_fn)
     voice_thr.start()
-    app.run(port = config.port)
+    app.run(port = nodeManager.get_port())
