@@ -10,7 +10,6 @@ import sqlite3 as sql;
 import click
 from flask.cli import AppGroup
 import requests
-import config
 import logging
 import os
 import speech_recognition as sr
