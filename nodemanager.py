@@ -1,21 +1,58 @@
 import config;
+import yaml
 
 class NodeManager:
-    # TODO - replace with a database
+    # TODO - replace known_nodes with a database
+    config_file = "config.yaml"
+    db_file = "data/data.db"
+
+    # Node data
     nodeName = "nameNotSet"
-    known_nodes = []
-    node_port = 4321
+    node_port = 5000
+    recognize_voice = False
 
     commands = []
 
-    recognize_voice = False
+    known_nodes = []
 
     def __init__(self):
-        self.nodeName = config.nodeName
-        self.known_nodes = config.known_nodes
-        self.node_port = config.port
-        self.commands = config.commands
-        self.recognize_voice = config.recognize_voice
+        self.read_config()
+
+    def read_config(self):
+        the_file = open(self.config_file, 'r')
+        config_yaml = yaml.safe_load(the_file)
+
+        self.nodeName = config_yaml['settings']['name']
+        self.node_port = config_yaml['settings']['port']
+        self.recognize_voice = config_yaml['settings']['recognize_voice']
+
+        for command in config_yaml['commands']:
+            self.commands.append((command['command'], command['script']))
+
+        for known_node in config_yaml['known_nodes']:
+            self.known_nodes.append(known_node)
+
+
+    def write_config(self):
+        config = {
+            'settings': {
+                'name': self.nodeName,
+                'port': self.node_port,
+                'recognize_voice': self.recognize_voice
+            },
+            'commands': [],
+            'known_nodes': self.known_nodes
+        }
+
+        for (command, script) in self.commands:
+            config['commands'].append({
+                                    'command': command,
+                                    'script': script
+                                    })
+
+        the_file = open(self.config_file, 'w')
+        yaml.dump(config, the_file, 
+                  default_flow_style=False, sort_keys=False)
 
     # Name
     def get_name(self):
