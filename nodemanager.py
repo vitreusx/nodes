@@ -1,4 +1,3 @@
-import config;
 import yaml
 
 class NodeManager:
