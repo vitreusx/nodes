@@ -60,6 +60,7 @@ class NodeManager:
 
     def set_name(self, newName):
         self.nodeName = newName
+        self.write_config()
 
     # Port
     def get_port(self):
@@ -67,6 +68,7 @@ class NodeManager:
 
     def set_port(self, new_port):
         self.node_port = new_port
+        self.write_config()
 
     # Known nodes
     def get_known_nodes(self):
@@ -77,9 +79,12 @@ class NodeManager:
 
         if not new_node in self.known_nodes:
             self.known_nodes.append(new_node)
+        
+        self.write_config()
 
     def remove_known_node(self, node_name):
         known_nodes = [node for node in known_nodes if node['name'] != node_name]
+        self.write_config()
 
     # Commands
     def do_command(self, command):
@@ -100,3 +105,4 @@ class NodeManager:
 
     def set_recognize_voice(self, should_recoginze):
         self.recognize_voice = should_recoginze
+        self.write_config()
