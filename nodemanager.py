@@ -2,7 +2,6 @@ import config;
 import yaml
 
 class NodeManager:
-    # TODO - replace known_nodes with a database
     config_file = "config.yaml"
     db_file = "data/data.db"
 
