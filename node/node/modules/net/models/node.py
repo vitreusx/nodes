@@ -3,8 +3,8 @@ from .statics import db, ma
 class Node(db.Model):
     __bind_key__ = 'net'
     __tablename__ = 'node'
-    addr = db.Column(db.String(320), primary_key=True)
-    alias = db.Column(db.String(80), unique=True, nullable=True)
+    addr = db.Column(db.String, primary_key=True)
+    alias = db.Column(db.String, unique=True, nullable=True)
 
     def __repr__(self):
         return NodeSchema().dumps(self)

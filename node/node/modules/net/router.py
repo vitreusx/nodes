@@ -7,11 +7,6 @@ import requests
 class Router:
     def __init__(self, db, conf):
         self.router = Blueprint('net', __name__)
-        
-        @self.router.record
-        def init_router(state):
-            global app
-            app = state.app
 
         @self.router.route('/name')
         def get_name():
