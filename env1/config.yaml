@@ -1,0 +1,6 @@
+root: '.'
+port: 8080
+modules:
+  net:
+    db: 'db/net.db'
+    name: 'env1'

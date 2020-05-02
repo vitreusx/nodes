@@ -1,16 +1,22 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from os.path import dirname
+import argparse as ap
+from .app import App
+from os.path import exists
+import yaml
 
-app = Flask(__name__)
-pwd = dirname(__file__)
+def parse_args():
+    parser = ap.ArgumentParser()
+    parser.add_argument('config', default = 'config.yaml', nargs='?', 
+        help='path to the config file')
+    
+    return parser.parse_args()
 
-app.config['SQLALCHEMY_BINDS'] = {
-    'net': f'sqlite:///{pwd}/db/net.db'
-}
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-from .modules.net import install
-install(app)
-
-app.run(port = 8080)
+if __name__ == '__main__':
+    args = parse_args()
+    try:
+        config = yaml.load(open(args.config, 'r').read(), 
+                           Loader=yaml.FullLoader)
+    except:
+        config = {}
+    
+    app = App(config)
+    app.flask.run(host = '0.0.0.0', port = config['port'] or 8080)
