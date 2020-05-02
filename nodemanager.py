@@ -1,4 +1,5 @@
 import yaml
+import os
 
 class NodeManager:
     config_path = "config.yaml"

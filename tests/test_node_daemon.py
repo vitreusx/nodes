@@ -1,6 +1,6 @@
 import unittest
 from multiprocessing import Process
-from noded import app, nodeManager
+from tests.node_instance import NodeInstance
 import requests
 import time
 import json
@@ -8,19 +8,20 @@ import json
 class TestNodeDaemon(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.port = nodeManager.get_port()
-        cls.server = Process(target=app.run, kwargs={'port':nodeManager.get_port()}) 
-        cls.server.start() # TODO redirect server output to log file
+        cls.nodeA = NodeInstance()
+        cls.port = 5000
+
+        time.sleep(2) # Wait for node to initialize
+        # TODO redirect server output to log file
 
         
     def testName(self):
         response = requests.get(f"http://localhost:{self.port}/api/name")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text, nodeManager.get_name())
+        self.assertEqual(response.text, "nodeA")
 
-        
     def testDoCommand(self):
-        response = requests.post(f"http://localhost:{self.port}/api/docommand", data={'cmd':'script_a.py'})
+        response = requests.post(f"http://localhost:{self.port}/api/docommand", data={'cmd':'script_a'})
 
         self.assertEqual(response.status_code, 200)
         
@@ -32,7 +33,7 @@ class TestNodeDaemon(unittest.TestCase):
 
 
     def testSendCommand(self):
-        response = requests.post(f"http://localhost:{self.port}/api/sendcommand", data={'cmd':"script_a.py", 'target':"nodeA"})
+        response = requests.post(f"http://localhost:{self.port}/api/sendcommand", data={'cmd':"script_a", 'target':"nodeA"})
             
         self.assertEqual(response.status_code, 200)
 
@@ -48,6 +49,8 @@ class TestNodeDaemon(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    # Disabled because it modifies config - will add shortly with better config handling
+    """
 
     def testConnect(self):
         response = requests.post(f"http://localhost:{self.port}/api/connect", data={'port': 1234, 'name': 'new_node'})
@@ -61,8 +64,8 @@ class TestNodeDaemon(unittest.TestCase):
 
         # Assert that new node is in known_nodes
         self.assertTrue(any([node_equal(node) for node in known_nodes]))
-
+    """
 
     @classmethod
     def tearDownClass(cls):
-        cls.server.terminate()
+        del cls.nodeA
