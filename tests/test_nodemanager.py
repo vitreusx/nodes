@@ -1,5 +1,5 @@
 import unittest
-from nodemanager import NodeManager
+from src.nodemanager import NodeManager
 import shutil
 
 def reset_config():

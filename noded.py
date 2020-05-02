@@ -14,7 +14,7 @@ import logging
 import os
 import speech_recognition as sr
 from threading import Thread
-from nodemanager import NodeManager;
+from src.nodemanager import NodeManager;
 
 class Node:
     def __init__(self, config_file = 'config.yaml', 
