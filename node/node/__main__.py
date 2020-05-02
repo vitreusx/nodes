@@ -5,8 +5,8 @@ import yaml
 
 def parse_args():
     parser = ap.ArgumentParser()
-    parser.add_argument('config', default = 'config.yaml', nargs='?', 
-        help='path to the config file')
+    parser.add_argument('config', default = 'config.yaml', nargs = '?', 
+        help = 'path to the config file')
     
     return parser.parse_args()
 
@@ -19,4 +19,6 @@ if __name__ == '__main__':
         config = {}
     
     app = App(config)
-    app.flask.run(host = '0.0.0.0', port = config['port'] or 8080)
+    app.flask.run(host = '0.0.0.0',
+                  port = config.get('port') or 8080,
+                  threaded = True)

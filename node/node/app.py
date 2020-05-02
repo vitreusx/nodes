@@ -13,8 +13,8 @@ class App:
         self.flask.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         self.flask.config['SQLALCHEMY_BINDS'] = {}
 
-        self.root = realpath(config['root'] or '.')
+        self.root = realpath(config.get('root') or '.')
 
-        for mod_name, conf in (config['modules'] or {}).items():
+        for mod_name, conf in (config.get('modules') or {}).items():
             mod = importlib.import_module(f'.modules.{mod_name}', package='node')
-            mod.install(self, conf)
+            mod.install(self, conf or {})
