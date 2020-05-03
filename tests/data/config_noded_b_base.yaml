@@ -1,6 +1,6 @@
 settings:
-  name: nodeA
-  port: 5000
+  name: nodeB
+  port: 5001
   recognize_voice: 0
 
 commands:
@@ -11,6 +11,6 @@ commands:
   script: script_b.py
 
 known_nodes:
-- name: nodeA
+- name: nodeB
   ip: 127.0.0.1
-  port: 5000
+  port: 5001
