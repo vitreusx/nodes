@@ -6,7 +6,7 @@ Daemon handles node stuff and serves web interface
 
 from flask import Flask, request, render_template, flash, redirect, url_for
 from flask import jsonify
-import sqlite3 as sql;
+import sqlite3 as sql
 import click
 from flask.cli import AppGroup
 import requests
@@ -14,7 +14,16 @@ import logging
 import os
 import speech_recognition as sr
 from threading import Thread
-from src.nodemanager import NodeManager;
+from src.nodemanager import NodeManager
+from werkzeug.urls import url_parse
+# from flask_table import Table, Col
+
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import ValidationError, DataRequired
+from forms import RenameForm
+import os
+
 
 class Node:
     def __init__(self, config_file = 'config.yaml', 
@@ -26,6 +35,8 @@ class Node:
         self.app = Flask(__name__, static_folder='data/html',
                                    template_folder='data/html')
         self.setup_app()
+
+        self.app.config['SECRET_KEY'] = os.urandom(32)
 
         if(self.manager.should_recognize_voice()):
             self.start_voice_recognition()
@@ -110,7 +121,17 @@ class Node:
         def home():
             '''GUI for managing the current node'''
             node_name = self.manager.get_name()
-            return render_template('index.html', node_name=node_name), 200
+            return render_template('index.html', title='Home', node_name=node_name), 200
+
+        @self.app.route('/rename_node', methods=['GET', 'POST'])
+        def rename_node():
+            form = RenameForm()
+            if form.validate_on_submit():
+                self.manager.set_name(form.new_name.data)
+                flash('Node renamed successfully.')
+
+            return render_template('rename_node.html', title='Rename the node', form=form), 200
+
 
     def start_voice_recognition(self):
 
@@ -141,7 +162,8 @@ class Node:
 
     def run(self):
         self.app.run(port = self.manager.get_port())
-    
+
+
 if __name__ == '__main__':
     node = Node()
     node.run()
