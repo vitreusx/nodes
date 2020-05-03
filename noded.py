@@ -4,7 +4,7 @@ Command line and web interfaces connect to it with an API
 Daemon handles node stuff and serves web interface
 """
 
-from flask import Flask, request;
+from flask import Flask, request, render_template;
 from flask import jsonify
 import sqlite3 as sql;
 import click
@@ -23,7 +23,8 @@ class Node:
         self.manager = NodeManager(config_file)
         logging.basicConfig(filename=log_file, level=logging.DEBUG) # Print server output to file
 
-        self.app = Flask(__name__, static_folder='data/html')
+        self.app = Flask(__name__, static_folder='data/html',
+                                   template_folder='data/html')
         self.setup_app()
 
         if(self.manager.should_recognize_voice()):
@@ -106,7 +107,8 @@ class Node:
 
         @self.app.route('/') # Serves web interface
         def home():
-            return app.send_static_file('index.html')
+            node_name = self.manager.get_name()
+            return render_template('index.html', name=node_name), 200
 
     def start_voice_recognition(self):
 
