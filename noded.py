@@ -83,9 +83,13 @@ class Node:
             if None in new_node.values():
                 return "Missing Parameter", 201
 
-            for node in self.manager.get_known_nodes(): # This node sends it also to itself. Is it ok?
+            known_nodes = [node for node in self.manager.get_known_nodes()]
+
+            for node in known_nodes:
+                result = requests.post(f"http://{new_node['ip']}:{new_node['port']}/api/addnode", data=node)
+
+            for node in known_nodes:
                 result = requests.post(f"http://{node['ip']}:{node['port']}/api/addnode", data=new_node)
-                # TODO what if this fails?
 
             return "ADDED", 200
 

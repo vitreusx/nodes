@@ -4,3 +4,6 @@ data/noded_db.db
 server_logs.log
 doc/build/
 venv/
+tests/data/config_noded_a.yaml
+tests/data/config_noded_b.yaml
+tests/data/config_noded_c.yaml

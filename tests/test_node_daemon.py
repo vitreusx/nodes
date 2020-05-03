@@ -6,15 +6,14 @@ import time
 import json
 
 class TestNodeDaemon(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.nodeA = NodeInstance()
-        cls.port = 5000
+    def setUp(self):
+        self.nodeA = NodeInstance()
+        self.port = 5000
 
         time.sleep(2) # Wait for node to initialize
         # TODO redirect server output to log file
 
-        
+
     def testName(self):
         response = requests.get(f"http://localhost:{self.port}/api/name")
         self.assertEqual(response.status_code, 200)
@@ -49,23 +48,5 @@ class TestNodeDaemon(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    # Disabled because it modifies config - will add shortly with better config handling
-    """
-
-    def testConnect(self):
-        response = requests.post(f"http://localhost:{self.port}/api/connect", data={'port': 1234, 'name': 'new_node'})
-
-        nodes = requests.get("http://localhost:5000/api/nodes")
-
-        known_nodes = json.loads(nodes.text)
-
-        def node_equal(other):
-            return int(other['port']) == 1234 and other['name'] == 'new_node'
-
-        # Assert that new node is in known_nodes
-        self.assertTrue(any([node_equal(node) for node in known_nodes]))
-    """
-
-    @classmethod
-    def tearDownClass(cls):
-        del cls.nodeA
+    def tearDown(self):
+        del self.nodeA
