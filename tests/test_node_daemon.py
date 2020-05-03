@@ -14,6 +14,10 @@ class TestNodeDaemon(unittest.TestCase):
         time.sleep(2) # Wait for node to initialize
         # TODO redirect server output to log file
 
+
+    def setUp(self):
+        print("set up test")
+
         
     def testName(self):
         response = requests.get(f"http://localhost:{self.port}/api/name")
@@ -65,6 +69,9 @@ class TestNodeDaemon(unittest.TestCase):
         # Assert that new node is in known_nodes
         self.assertTrue(any([node_equal(node) for node in known_nodes]))
     """
+
+    def tearDown(self):
+        print("tearDown")
 
     @classmethod
     def tearDownClass(cls):
