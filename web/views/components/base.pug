@@ -1,0 +1,20 @@
+doctype
+html(lang='en')
+  head
+    include head
+  body
+    nav.navbar.navbar-dark.fixed-top.bg-dark.flex-md-nowrap.p-0.shadow
+      a.navbar-brand.col-sm-3.col-md-2.mr-0(href='/') Aurora
+    
+    .container-fluid
+      .row
+        nav.col-md-2.d-none.d-md-block.bg-light.sidebar
+          .sidebar-sticky
+            ul.nav.flex-column
+              each seg in ['Network', 'Voice', 'Features']
+                li.nav-item
+                  a.nav-link
+                    =seg
+        
+        main.col-md-9.ml-sm-auto.col-lg-10.px-4(role='main')
+          block content
