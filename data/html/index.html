@@ -2,8 +2,6 @@
 
 {% block content %}
     <h1>Network management GUI</h1>
-    <p><b>Node name:</b> {{ node_name }}</p>
-    <div>
-		<a href="{{ url_for('rename_node') }}">Rename node</a>
-    </div>
+    <p><b>Node name:</b> {{ node_name }} <br> <a href="{{ url_for('rename_node') }}">Rename node</a></p>
+    <p><b>Port:</b> {{ port }} <br> <a href="{{ url_for('change_port') }}">Change port</a></p>
 {% endblock %}

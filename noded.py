@@ -16,12 +16,11 @@ import speech_recognition as sr
 from threading import Thread
 from src.nodemanager import NodeManager
 from werkzeug.urls import url_parse
-# from flask_table import Table, Col
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError, DataRequired
-from forms import RenameForm
+from forms import *
+# from flask_table import Table, Col
 import os
 
 
@@ -121,7 +120,8 @@ class Node:
         def home():
             '''GUI for managing the current node'''
             node_name = self.manager.get_name()
-            return render_template('index.html', title='Home', node_name=node_name), 200
+            port = self.manager.get_port()
+            return render_template('index.html', title='Home', node_name=node_name, port=port), 200
 
         @self.app.route('/rename_node', methods=['GET', 'POST'])
         def rename_node():
@@ -130,7 +130,16 @@ class Node:
                 self.manager.set_name(form.new_name.data)
                 flash('Node renamed successfully.')
 
-            return render_template('rename_node.html', title='Rename the node', form=form), 200
+            return render_template('rename_node.html', title='Rename node', form=form), 200
+
+        @self.app.route('/change_port', methods=['GET', 'POST'])
+        def change_port():
+            form = ChangePortForm()
+            if form.validate_on_submit():
+                self.manager.set_port(form.new_port.data)
+                flash('Port changed successfully.')
+
+            return render_template('change_port.html', title='Change port', form=form), 200
 
 
     def start_voice_recognition(self):
