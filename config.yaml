@@ -4,13 +4,17 @@ settings:
   recognize_voice: 0
 
 commands:
-- command: script1
-  script: script1.py
+- command: script_a
+  script: script_a.py
 
-- command: script2
-  script: script2.py
+- command: script_b
+  script: script_b.py
 
 known_nodes:
+- name: nodeA
+  ip: 127.0.0.1
+  port: 5000
+
 - name: nodeB
   ip: 127.0.0.1
   port: 5001
