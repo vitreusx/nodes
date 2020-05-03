@@ -20,8 +20,14 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError, DataRequired
 from forms import *
-# from flask_table import Table, Col
+from flask_table import Table, Col
 import os
+
+
+class NodeTable(Table):
+    name = Col('Name')
+    ip = Col('IP')
+    port = Col('Port')
 
 
 class Node:
@@ -121,7 +127,9 @@ class Node:
             '''GUI for managing the current node'''
             node_name = self.manager.get_name()
             port = self.manager.get_port()
-            return render_template('index.html', title='Home', node_name=node_name, port=port), 200
+            known_nodes = NodeTable(self.manager.get_known_nodes())
+            return render_template('index.html', title='Home', node_name=node_name, port=port, 
+                known_nodes=known_nodes), 200
 
         @self.app.route('/rename_node', methods=['GET', 'POST'])
         def rename_node():
@@ -140,6 +148,25 @@ class Node:
                 flash('Port changed successfully.')
 
             return render_template('change_port.html', title='Change port', form=form), 200
+
+        @self.app.route('/add_known_node', methods=['GET', 'POST'])
+        def add_known_node():
+            form = AddKnownNodeForm()
+            if form.validate_on_submit():
+                self.manager.add_known_node(form.node_name.data, form.node_ip.data, form.node_port.data)
+                flash('Known node added successfully.')
+
+            return render_template('add_known_node.html', title='Add known node', form=form), 200
+
+        @self.app.route('/remove_known_node', methods=['GET', 'POST'])
+        def remove_known_node():
+            form = RemoveKnownNodeForm()
+            if form.validate_on_submit():
+                self.manager.remove_known_node(form.node_name.data)
+                flash('Known node removed successfully.')
+
+            return render_template('remove_known_node.html', title='Remove known node', form=form), 200
+
 
 
     def start_voice_recognition(self):
