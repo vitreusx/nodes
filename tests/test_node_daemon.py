@@ -7,7 +7,7 @@ import json
 
 class TestNodeDaemon(unittest.TestCase):
     def setUp(self):
-        self.nodeA = NodeInstance("tests/data/config_noded_a.yaml")
+        self.nodeA = NodeInstance()
         self.port = 5000
 
         time.sleep(2) # Wait for node to initialize
@@ -47,23 +47,6 @@ class TestNodeDaemon(unittest.TestCase):
         response = requests.post(f"http://localhost:{self.port}/api/sendcommand", data={'cmd':"correct command", 'target':"not existing node"})
 
         self.assertEqual(response.status_code, 400)
-
-    # Disabled because it modifies config - will add shortly with better config handling
-    """
-
-    def testConnect(self):
-        response = requests.post(f"http://localhost:{self.port}/api/connect", data={'port': 1234, 'name': 'new_node'})
-
-        nodes = requests.get("http://localhost:5000/api/nodes")
-
-        known_nodes = json.loads(nodes.text)
-
-        def node_equal(other):
-            return int(other['port']) == 1234 and other['name'] == 'new_node'
-
-        # Assert that new node is in known_nodes
-        self.assertTrue(any([node_equal(node) for node in known_nodes]))
-    """
 
     def tearDown(self):
         del self.nodeA
