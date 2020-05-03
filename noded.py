@@ -20,14 +20,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError, DataRequired
 from forms import *
-from flask_table import Table, Col
-import os
-
-
-class NodeTable(Table):
-    name = Col('Name')
-    ip = Col('IP')
-    port = Col('Port')
 
 
 class Node:

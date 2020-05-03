@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField
 from wtforms.validators import ValidationError, DataRequired
+from flask_table import Table, Col
 
 
 class RenameForm(FlaskForm):
@@ -23,3 +24,9 @@ class AddKnownNodeForm(FlaskForm):
 class RemoveKnownNodeForm(FlaskForm):
 	node_name = StringField('Name', validators=[DataRequired()])
 	submit = SubmitField('Remove')
+
+
+class NodeTable(Table):
+    name = Col('Name')
+    ip = Col('IP')
+    port = Col('Port')
