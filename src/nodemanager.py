@@ -105,14 +105,23 @@ class NodeManager:
     def get_known_nodes(self):
         return self.known_nodes
 
+    # Returns false if such node already exists and adding is not possible, true otherwise.
     def add_known_node(self, node_name, node_ip, node_port):
         new_node = {'name': node_name, 'ip': node_ip, 'port': node_port}
 
         if not new_node in self.known_nodes:
             self.known_nodes.append(new_node)
-        
-        self.write_config()
+            self.write_config()
+            return True
+        else:
+            return False
 
+    # Returns false if no such node exists and removing is not possible, true otherwise.
     def remove_known_node(self, node_name):
-        self.known_nodes = [node for node in self.known_nodes if node['name'] != node_name]
-        self.write_config()
+        new_known_nodes = [node for node in self.known_nodes if node['name'] != node_name]
+        if self.known_nodes == new_known_nodes: 
+            return False
+        else:
+            self.known_nodes = new_known_nodes
+            self.write_config()
+            return True

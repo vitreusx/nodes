@@ -153,8 +153,10 @@ class Node:
         def add_known_node():
             form = AddKnownNodeForm()
             if form.validate_on_submit():
-                self.manager.add_known_node(form.node_name.data, form.node_ip.data, form.node_port.data)
-                flash('Known node added successfully.')
+                if self.manager.add_known_node(form.node_name.data, form.node_ip.data, form.node_port.data):
+                    flash('Known node added successfully.')
+                else:
+                    flash('Such node already exists')
 
             return render_template('add_known_node.html', title='Add known node', form=form), 200
 
@@ -162,8 +164,10 @@ class Node:
         def remove_known_node():
             form = RemoveKnownNodeForm()
             if form.validate_on_submit():
-                self.manager.remove_known_node(form.node_name.data)
-                flash('Known node removed successfully.')
+                if self.manager.remove_known_node(form.node_name.data):
+                    flash('Known node removed successfully.')
+                else:
+                    flash('A node with this name does not exist')
 
             return render_template('remove_known_node.html', title='Remove known node', form=form), 200
 
