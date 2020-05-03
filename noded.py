@@ -4,7 +4,7 @@ Command line and web interfaces connect to it with an API
 Daemon handles node stuff and serves web interface
 """
 
-from flask import Flask, request, render_template;
+from flask import Flask, request, render_template, flash, redirect, url_for
 from flask import jsonify
 import sqlite3 as sql;
 import click
@@ -106,9 +106,11 @@ class Node:
             return "ADDED", 200
 
         @self.app.route('/') # Serves web interface
+        @self.app.route('/index')
         def home():
+            '''GUI for managing the current node'''
             node_name = self.manager.get_name()
-            return render_template('index.html', name=node_name), 200
+            return render_template('index.html', node_name=node_name), 200
 
     def start_voice_recognition(self):
 

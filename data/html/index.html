@@ -1,9 +1,6 @@
-<html>
-  <head>
-    <title>Noded control</title>
-  </head>
-  <body>
-    <h1>This is control of node with name: {{ name }}!</h1>
-    <p>Welcome to the world of Flask!</p>
-  </body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Network management GUI</h1>
+    <p><b>Node name:</b> {{ node_name }}</p>
+{% endblock %}
