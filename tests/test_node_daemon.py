@@ -6,19 +6,14 @@ import time
 import json
 
 class TestNodeDaemon(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.nodeA = NodeInstance()
-        cls.port = 5000
+    def setUp(self):
+        self.nodeA = NodeInstance("tests/data/config_noded_a.yaml")
+        self.port = 5000
 
         time.sleep(2) # Wait for node to initialize
         # TODO redirect server output to log file
 
 
-    def setUp(self):
-        print("set up test")
-
-        
     def testName(self):
         response = requests.get(f"http://localhost:{self.port}/api/name")
         self.assertEqual(response.status_code, 200)
@@ -71,8 +66,4 @@ class TestNodeDaemon(unittest.TestCase):
     """
 
     def tearDown(self):
-        print("tearDown")
-
-    @classmethod
-    def tearDownClass(cls):
-        del cls.nodeA
+        del self.nodeA
