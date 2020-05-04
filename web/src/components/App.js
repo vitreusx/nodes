@@ -1,64 +1,89 @@
 import React from 'react';
+import { Switch, Route, Link, useLocation } from 'react-router-dom';
+import Index from './Index';
+import General from './General';
+import Network from './Network';
+import Voice from './Voice';
+import Features from './Features';
 import './App.css';
 
-class App extends React.Component {
-  state = {
-    current: 'Index'
+function App() {
+  const labels = {
+    '/': 'Index',
+    '/general': 'General',
+    '/network': 'Network',
+    '/voice': 'Voice',
+    '/features': 'Features'
   };
 
-  Navbar = (props) => {
+  function Navbar() {
     return (
       <nav className='navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow'>
-        <a className='navbar-brand col-sm-3 col-md-2 mr-0' href='/'>
-          <strong> {props.name} </strong>
-        </a>
+        <Link className='navbar-brand col-sm-3 col-md-2 mr-0' to='/'>
+          <strong>Aurora</strong> 
+        </Link>
         <div className='navbar-brand bg-dark px-3 w-100'>
-          <span className='nav-item'> {props.current} </span>
+          <span className='nav-item'>{labels[useLocation().pathname]}</span>
         </div>
       </nav>
     );
-  };
+  }
 
-  Primary = (props) => {
-    const mods = [
-      { label: 'Index', route: '/' },
-      { label: 'General', route: '/general' },
-      { label: 'Network', route: '/network' },
-      { label: 'Voice', route: '/voice' },
-      { label: 'Features', route: '/features' }
-    ];
+  function Sidebar() {
+    const sidebarRoutes = ['/general', '/network', '/voice', '/features'];
 
-    const modItems = mods.map((mod) =>
-      <li className='nav-item' key={mod.label}>
-        <a className={`nav-link ${this.state.current === mod.label ? 'active' : ''}`} href={mod.route}>
-          {mod.label}
-        </a>
-      </li>
+    function Item(props) {
+      let activeClass = useLocation().pathname === props.route ? 'active' : '';
+      
+      return (
+        <li className='nav-item' key={props.route}>
+          <Link className={`nav-link ${activeClass}`} to={props.route}>
+            {labels[props.route]}
+          </Link>
+        </li>
+      )
+    }
+
+    const items = sidebarRoutes.map((route) =>
+      <Item route={route} />
     );
 
     return (
-      <div className='container-fluid'>
-        <div className='row'>
-          <nav className='col-md-2 d-md-block bg-light sidebar'>
-            <div className='sidebar-sticky'>
-              <ul className='nav flex-column'>
-                {modItems}
-              </ul>
-            </div>
-          </nav>
+      <nav className='col-md-2 d-md-block bg-light sidebar'>
+        <div className='sidebar-sticky'>
+          <ul className='nav flex-column'>
+            {items}
+          </ul>
         </div>
-      </div>
-    )
-  };
-
-  render() {
-    return (
-      <div className='App'>
-        <this.Navbar name='Aurora' current={this.state.current} />
-        <this.Primary />        
-      </div>
+      </nav>
     );
   }
+
+  function Primary() {
+    return (
+      <main className='col-md-9 ml-sm-auto col-lg-10 px-4' role='main'>
+        <Switch>
+          <Route path='/general' component={General} />
+          <Route path='/network' component={Network} />
+          <Route path='/voice' component={Voice} />
+          <Route path='/features' component={Features} />
+          <Route path='/' component={Index} />
+        </Switch>
+      </main>
+    );
+  }
+
+  return (
+    <div className='App'>
+      <Navbar />
+      <div className='container-fluid'>
+        <div className='row'>
+          <Sidebar />
+          <Primary />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default App;
