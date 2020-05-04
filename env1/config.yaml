@@ -1,9 +1,0 @@
-port: 8080
-modules:
-  net:
-    name: 'env1'
-    db: 'db/net.db'
-  vox:
-    automatic: True
-    db: 'db/vox.db'
-    cloud: 'auth.json'
