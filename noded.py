@@ -4,9 +4,9 @@ Command line and web interfaces connect to it with an API
 Daemon handles node stuff and serves web interface
 """
 
-from flask import Flask, request;
+from flask import Flask, request, render_template, flash, redirect, url_for
 from flask import jsonify
-import sqlite3 as sql;
+import sqlite3 as sql
 import click
 from flask.cli import AppGroup
 import requests
@@ -14,7 +14,13 @@ import logging
 import os
 import speech_recognition as sr
 from threading import Thread
-from src.nodemanager import NodeManager;
+from src.nodemanager import NodeManager
+from werkzeug.urls import url_parse
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import ValidationError, DataRequired
+from forms import *
+
 
 class Node:
     def __init__(self, config_file = 'config.yaml', 
@@ -23,8 +29,11 @@ class Node:
         self.manager = NodeManager(config_file)
         logging.basicConfig(filename=log_file, level=logging.DEBUG) # Print server output to file
 
-        self.app = Flask(__name__, static_folder='data/html')
+        self.app = Flask(__name__, static_folder='data/html',
+                                   template_folder='data/html')
         self.setup_app()
+
+        self.app.config['SECRET_KEY'] = os.urandom(32)
 
         if(self.manager.should_recognize_voice()):
             self.start_voice_recognition()
@@ -109,8 +118,56 @@ class Node:
             return "ADDED", 200
 
         @self.app.route('/') # Serves web interface
+        @self.app.route('/index')
         def home():
-            return app.send_static_file('index.html')
+            '''GUI for managing the current node'''
+            node_name = self.manager.get_name()
+            port = self.manager.get_port()
+            known_nodes = NodeTable(self.manager.get_known_nodes())
+            return render_template('index.html', title='Home', node_name=node_name, port=port, 
+                known_nodes=known_nodes), 200
+
+        @self.app.route('/rename_node', methods=['GET', 'POST'])
+        def rename_node():
+            form = RenameForm()
+            if form.validate_on_submit():
+                self.manager.set_name(form.new_name.data)
+                flash('Node renamed successfully.')
+
+            return render_template('rename_node.html', title='Rename node', form=form), 200
+
+        @self.app.route('/change_port', methods=['GET', 'POST'])
+        def change_port():
+            form = ChangePortForm()
+            if form.validate_on_submit():
+                self.manager.set_port(form.new_port.data)
+                flash('Port changed successfully.')
+
+            return render_template('change_port.html', title='Change port', form=form), 200
+
+        @self.app.route('/add_known_node', methods=['GET', 'POST'])
+        def add_known_node():
+            form = AddKnownNodeForm()
+            if form.validate_on_submit():
+                if self.manager.add_known_node(form.node_name.data, form.node_ip.data, form.node_port.data):
+                    flash('Known node added successfully.')
+                else:
+                    flash('Such node already exists')
+
+            return render_template('add_known_node.html', title='Add known node', form=form), 200
+
+        @self.app.route('/remove_known_node', methods=['GET', 'POST'])
+        def remove_known_node():
+            form = RemoveKnownNodeForm()
+            if form.validate_on_submit():
+                if self.manager.remove_known_node(form.node_name.data):
+                    flash('Known node removed successfully.')
+                else:
+                    flash('A node with this name does not exist')
+
+            return render_template('remove_known_node.html', title='Remove known node', form=form), 200
+
+
 
     def start_voice_recognition(self):
 
@@ -141,7 +198,8 @@ class Node:
 
     def run(self):
         self.app.run(port = self.manager.get_port())
-    
+
+
 if __name__ == '__main__':
     node = Node()
     node.run()

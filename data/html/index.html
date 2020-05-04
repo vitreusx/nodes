@@ -1,4 +1,12 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<title> Noded control </title>
-<h1>Nodeded</h1>
-<p>Here you can use noded as nodeweb</p>
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Network management GUI</h1>
+    <p><b>Node name:</b> {{ node_name }}<br><a href="{{ url_for('rename_node') }}">Rename node</a></p>
+    <p><b>Port:</b> {{ port }}<br><a href="{{ url_for('change_port') }}">Change port</a></p>
+    <br>
+    <h2>Known nodes</h2>
+    <p>{{ known_nodes }}</p>
+    <p><a href="{{ url_for('add_known_node') }}">Add a known node</a></p>
+    <p><a href="{{ url_for('remove_known_node') }}">Remove a known node</a></p>
+{% endblock %}
