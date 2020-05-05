@@ -2,6 +2,7 @@ import argparse as ap
 from .app import App
 from os.path import exists
 import yaml
+from flask_cors import CORS
 
 def parse_args():
     parser = ap.ArgumentParser()
@@ -19,6 +20,7 @@ if __name__ == '__main__':
         config = {}
     
     app = App(config)
+    CORS(app.flask)
     app.flask.run(host = '0.0.0.0',
                   port = config.get('port') or 8080,
                   threaded = True)

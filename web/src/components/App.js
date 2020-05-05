@@ -61,7 +61,7 @@ const App = () => {
 
   const Primary = () => {
     return (
-      <main className='col-md-9 ml-sm-auto col-lg-10 px-4' role='main'>
+      <main className='col-md-10 ml-sm-auto col-lg-10 px-4' role='main'>
         <Switch>
           <Route path='/general' component={General} />
           <Route path='/network' component={Network} />

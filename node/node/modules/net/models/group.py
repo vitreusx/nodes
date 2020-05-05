@@ -8,9 +8,6 @@ class Group(db.Model):
     name = db.Column(db.String, primary_key=True)
     members = db.relationship('Node', secondary='member')
 
-    def __repr__(self):
-        return GroupSchema().dumps(self)
-
 class GroupSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Group

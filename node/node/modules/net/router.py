@@ -1,6 +1,5 @@
 from flask import Blueprint, request as req
-from .models import Group, Node, Member
-from .models.group import GroupSchema
+from .models import Group, Member, Node
 import json
 import requests
 
@@ -30,11 +29,12 @@ class Router:
         def create(group):
             grp = Group(name = group)
             db.session.add(grp)
-
-            node = Node(addr = req.host)
-            grp.members.append(node)
-
             db.session.commit()
+
+            node = Node.query.filter_by(addr = req.host).first() or Node(addr = req.host)
+            grp.members.append(node)
+            db.session.commit()
+
             return ''
 
         @self.router.route('/group/<group>/destroy', methods = ['POST'])
@@ -66,7 +66,8 @@ class Router:
         @self.router.route('/group/<group>/members')
         def list_members(group):
             grp = Group.query.filter_by(name = group).first_or_404()
-            return grp.members
+            members = [{'addr': mem.addr, 'alias': mem.alias or ''} for mem in grp.members]
+            return json.dumps(members)
 
         @self.router.route('/group/<group>/proxy', methods = ['GET', 'POST'])
         def proxy(group):
