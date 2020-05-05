@@ -7,7 +7,7 @@ import Voice from './Voice';
 import Features from './Features';
 import './App.css';
 
-function App() {
+const App = () => {
   const labels = {
     '/': 'Index',
     '/general': 'General',
@@ -16,7 +16,7 @@ function App() {
     '/features': 'Features'
   };
 
-  function Navbar() {
+  const Navbar = () => {
     return (
       <nav className='navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow'>
         <Link className='navbar-brand col-sm-3 col-md-2 mr-0' to='/'>
@@ -29,10 +29,10 @@ function App() {
     );
   }
 
-  function Sidebar() {
+  const Sidebar = () => {
     const sidebarRoutes = ['/general', '/network', '/voice', '/features'];
 
-    function Item(props) {
+    const Item = (props) => {
       let activeClass = useLocation().pathname === props.route ? 'active' : '';
       
       return (
@@ -59,7 +59,7 @@ function App() {
     );
   }
 
-  function Primary() {
+  const Primary = () => {
     return (
       <main className='col-md-9 ml-sm-auto col-lg-10 px-4' role='main'>
         <Switch>
