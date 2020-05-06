@@ -9,7 +9,7 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const retrieveGroups = async () => {
       try {
-        const res = await fetch(`http://${addr}/net/groups`);
+        const res = await fetch(`http://${addr}/net/list`);
         const data = await res.json();
         setGroups(data);
       }

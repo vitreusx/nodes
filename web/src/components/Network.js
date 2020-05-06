@@ -27,7 +27,7 @@ const Network = () => {
       <table className='table table-hover'>
         <thead className='thead-dark'>
           <tr>
-            <th>Group Name</th>
+            <th>Groups</th>
           </tr>
         </thead>
         <tbody>
@@ -40,7 +40,7 @@ const Network = () => {
   useEffect(() => {
     const retrieveMembers = async () => {
       try {
-        const res = await fetch(`http://${addr}/net/group/${selected}/members`);
+        const res = await fetch(`http://${addr}/net/g/${selected}/list`);
         const data = await res.json();
         setMembers(data);
       }
@@ -55,8 +55,8 @@ const Network = () => {
   const MemberRow = (props) => {
     return (
       <tr data-name={props.name}>
-        <td>{props.member.addr}</td>
-        <td>{props.member.alias}</td>
+        <td>{props.addr}</td>
+        <td>{props.name}</td>
       </tr>
     )
   }
@@ -66,12 +66,13 @@ const Network = () => {
       <table className='table table-hover'>
         <thead className='thead-dark'>
           <tr>
-            <th>Member Address</th>
-            <th>Member Alias</th>
+            <th colSpan={2}>Members</th>
           </tr>
         </thead>
         <tbody>
-          {(members || []).map(member => <MemberRow key={member.name} member={member} />)}
+          {Object.entries(members || {})
+            .map(([name, addr], idx) => 
+              <MemberRow key={name} name={name} addr={addr}/>)}
         </tbody>
       </table>
     );
@@ -80,10 +81,10 @@ const Network = () => {
   return (
     <div className='container-fluid mt-3'>
       <div className='row'>
-        <div className='col-md-4 table-responsive'>
+        <div className='col-md-2 table-responsive'>
           <GroupsTable />
         </div>
-        <div className='col-md-8 table-responsive'>
+        <div className='col-md-2 table-responsive'>
           <MembersTable />
         </div>
       </div>
