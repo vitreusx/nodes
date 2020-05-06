@@ -1,84 +1,86 @@
 from flask import Blueprint, request as req
-from .models import Group, Member, Node
 import json
 import requests
+import socket
+import shelve
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.255.255.255', 1))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = '127.0.0.1'
+    finally:
+        s.close()
+    return ip
 
 class Router:
-    def __init__(self, db, conf):
-        self.router = Blueprint('net', __name__)
+    def __init__(self, conf, port, db):
+        self.router = Blueprint('net', __name__)        
+        addr = f'{get_ip()}:{port}'
 
-        @self.router.route('/name')
-        def get_name():
-            return conf.get('name') or ''
-
-        @self.router.route('/groups')
+        @self.router.route('/list', methods = ['GET'])
         def list_groups():
-            names = [group.name for group in Group.query.all()]
-            return json.dumps(names)
-
-        @self.router.route('/group/<group>/update', methods = ['POST'])
-        def update(group):
-            payload = req.json or {}
-            grp = Group.query.filter_by(name = group).first_or_404()
-            grp.update(payload)
+            return json.dumps(list(db.keys()))
+        
+        @self.router.route('/g/<group>', methods = ['PUT'])
+        def create_group(group):
+            if group in db:
+                return 500, 'Group already exists.'
             
-            db.session.commit()
+            db[group] = {
+                'local': conf.get('name'),
+                'members': {conf.get('name'): addr}
+            }
             return ''
 
-        @self.router.route('/group/<group>/create', methods = ['POST'])
-        def create(group):
-            grp = Group(name = group)
-            db.session.add(grp)
-            db.session.commit()
+        @self.router.route('/g/<group>', methods = ['DELETE'])
+        def delete_group(group):
+            if group not in db:
+                return 'No such group exists.', 500
+            
+            grp = db[group]
+            if not req.args.get('local'):
+                for name, addr in grp['members'].items():
+                    if name != grp['local']:
+                        requests.delete(f'http://{addr}/g/{group}')
 
-            node = Node.query.filter_by(addr = req.host).first() or Node(addr = req.host)
-            grp.members.append(node)
-            db.session.commit()
-
+            del db[group]
             return ''
-
-        @self.router.route('/group/<group>/destroy', methods = ['POST'])
-        def destroy(group):
-            grp = Group.query.filter_by(name = group).first_or_404()
-            db.session.delete(grp)
-            db.session.commit()
-            return ''
-
-        @self.router.route('/group/<group>/join', methods = ['POST'])
-        def join(group):
-            payload = req.json or {}
-            grp = Group.query.filter_by(name = group).first_or_404()
-            node = Node(addr = req.remote_addr)
-            if 'alias' in payload:
-                node.alias = payload.get('alias')
-            grp.members.append(node)
-            db.session.commit()
-            return ''
-
-        @self.router.route('/group/<group>/leave', methods = ['POST'])
-        def leave(group):
-            node = Node(addr = req.remote_addr)
-            grp = Group.query.filter_by(name = group).first_or_404()
-            grp.members.delete(node)
-            db.session.commit()
-            return ''
-
-        @self.router.route('/group/<group>/members')
+        
+        @self.router.route('/g/<group>/list', methods = ['GET'])
         def list_members(group):
-            grp = Group.query.filter_by(name = group).first_or_404()
-            members = [{'addr': mem.addr, 'alias': mem.alias or ''} for mem in grp.members]
-            return json.dumps(members)
+            if group not in db:
+                return 'No such group exists.', 500
 
-        @self.router.route('/group/<group>/proxy', methods = ['GET', 'POST'])
-        def proxy(group):
-            payload = req.json or {}
-            target = payload.get('target')
-            target_node = Member.query.filter(
-                Member.group == group and 
-                (Member.node.addr == target or
-                 Member.node.alias == target)).first_or_404()
+            return json.dumps(db[group]['members'])
 
-            proc = requests.get if req.method == 'GET' else requests.post
-            r = proc(f'http://{target_node.addr}{payload.get("command")}',
-                     payload.get('payload'))
-            return r.content, r.status_code, r.headers.items()
+        @self.router.route('/g/<group>/m/<member>', methods = ['PUT'])
+        def add_member(group, member):
+            if group not in db:
+                return 'No such group exists.', 500
+            
+            grp = db[group]
+            if member in grp['members']:
+                return 'Member already exists.', 500
+            
+            grp['members'][member] = req.json()['addr']
+            return ''
+
+        @self.router.route('/g/<group>/m/<member>', methods = ['DELETE'])
+        def delete_member(group, member):
+            if group not in db:
+                return 'No such group exists.', 500
+            
+            grp = db[group]
+            if member not in grp['members']:
+                return 'No such member exists.', 500
+            
+            if not req.args.get('local'):
+                for name, addr in grp['members'].items():
+                    if name != grp.local:
+                        requests.delete(f'http://{addr}/g/{group}/m/{member}')
+            
+            del grp[member]
+            return ''
