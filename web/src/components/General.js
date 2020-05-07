@@ -1,4 +1,6 @@
 import React, { useContext } from 'react';
+import InputGroup from 'react-bootstrap/InputGroup';
+import FormControl from 'react-bootstrap/FormControl';
 import AppContext from './AppContext';
 
 const General = () => {
@@ -6,12 +8,14 @@ const General = () => {
   const [addr, setAddr] = ctx.addr;
 
   return (
-    <div className='input-group mb-3 mt-3'>
-      <div className='input-group-prepend'>
-        <span className='input-group-text'>Node address</span>
-      </div>
-      <input type='text' className='form-control' placeholder='Address/Hostname'
+    <div>
+      <InputGroup className='mb-3 mt-3'>
+        <InputGroup.Prepend>
+          <InputGroup.Text>Node address</InputGroup.Text>
+        </InputGroup.Prepend>
+        <FormControl placeholder='Address/Hostname' 
         value={addr} onChange={e => setAddr(e.target.value)} />
+      </InputGroup>
     </div>
   )
 }

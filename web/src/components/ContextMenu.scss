@@ -1,0 +1,29 @@
+@import '~bootstrap/scss/bootstrap';
+
+.react-contextmenu {
+    @extend .dropdown-menu;
+}
+
+.react-contextmenu--visible {
+    @extend .react-contextmenu.show;
+}
+
+.react-contextmenu-item {
+    @extend .dropdown-item;
+}
+
+.react-contextmenu-item--active {
+    @extend .react-contextmenu-item.active;
+}
+
+.react-contextmenu-item--selected {
+    @extend .react-contextmenu-item--active;
+}
+
+.react-contextmenu-item--disabled {
+    @extend .react-contextmenu-item.disabled;
+}
+
+.react-contextmenu-item--divider {
+    @extend .dropdown-divider;
+}

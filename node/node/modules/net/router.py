@@ -52,7 +52,7 @@ class Router:
             
             for _, addr in self.propagate(db[group]):
                 requests.delete(f'http://{addr}/notify/{group}')
-            intra_delete_group(group)
+            notify_delete_group(group)
 
             return ''
         
@@ -62,6 +62,13 @@ class Router:
                 return 'No such group exists.', 500
 
             return json.dumps(db[group]['members'])
+
+        @self.router.route('/g/<group>/local', methods = ['GET'])
+        def get_local_name(group):
+            if group not in db:
+                return 'No such group exists.', 500
+            
+            return db[group]['local']
         
         @self.router.route('/notify/<group>/added', methods = ['POST'])
         def notify_added(group):
@@ -110,7 +117,7 @@ class Router:
                 return 'No such member exists.', 500
             
             for _, addr in self.propagate(grp):
-                requests.delete(f'http://{addr}/notifyg/{group}/m/{member}?local')            
+                requests.delete(f'http://{addr}/notify/{group}/m/{member}?local')
             notify_delete_member(group, member)
 
             if member == grp['local']:
@@ -119,3 +126,11 @@ class Router:
                 requests.delete(f'http://{grp["members"][member]}/notify/{group}')
             
             return ''
+
+        @self.router.route('/g/<group>/leave', methods = ['POST'])
+        def leave_group(group):
+            if group not in db:
+                return 'No such group exists.', 500
+
+            return delete_member(group, db[group]['local'])
+            

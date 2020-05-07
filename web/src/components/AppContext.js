@@ -8,13 +8,18 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     const retrieveGroups = async () => {
-      try {
-        const res = await fetch(`http://${addr}/net/list`);
-        const data = await res.json();
-        setGroups(data);
-      }
-      catch (e) {
+      if (addr === null) {
         setGroups(null);
+      }
+      else {
+        try {
+          const res = await fetch(`http://${addr}/net/list`);
+          const data = await res.json();
+          setGroups(data);
+        }
+        catch (e) {
+          setGroups(null);
+        }
       }
     } 
 
