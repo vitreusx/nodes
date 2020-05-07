@@ -1,13 +1,15 @@
-import React, { useContext, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useContext, useState, useEffect } from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Tab from 'react-bootstrap/Tab';
 import Modal from 'react-bootstrap/Modal';
+import InputGroup from 'react-bootstrap/InputGroup';
+import FormControl from 'react-bootstrap/FormControl';
+import Button from 'react-bootstrap/Button';
 import AppContext from './AppContext';
 import Members from './Members';
-
+import Error from './Error';
 import { ContextMenu, MenuItem, ContextMenuTrigger, connectMenu } from 'react-contextmenu';
 
 const GroupContextMenu = (props) => {
@@ -17,7 +19,7 @@ const GroupContextMenu = (props) => {
   let exn = null;
   const [showError, setShowError] = useState(false);
 
-  const leave = async e => {
+  const leave = async () => {
     try {
       await fetch(`http://${ctx.addr[0]}/net/g/${group}/leave`, {
         method: 'POST'
@@ -29,7 +31,7 @@ const GroupContextMenu = (props) => {
     }    
   }
 
-  const destroy = async e => {
+  const destroy = async () => {
     try {
       await fetch(`http://${ctx.addr[0]}/net/g/${group}`, {
         method: 'DELETE'
@@ -49,48 +51,93 @@ const GroupContextMenu = (props) => {
       <MenuItem onClick={destroy}>
         Delete the group
       </MenuItem>
-      <Modal show={showError} onHide={() => setShowError(false)} animation={false}>
-        <Modal.Header closeButton>
-          An error occured!
-        </Modal.Header>
-        <Modal.Body>
-          Server response: {exn && exn.toString()}
-        </Modal.Body>
-      </Modal>
+      <Error show={showError} setShow={setShowError} e={exn} />
     </ContextMenu>
   )
 }
 
-GroupContextMenu.propTypes = {
-  id: PropTypes.string.isRequired,
-  trigger: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      onItemClick: PropTypes.func.isRequired,
-      allowRemoval: PropTypes.bool
-  }).isRequired
-};
-
 const ConnGroupContextMenu = connectMenu('group-ctx')(GroupContextMenu);
 
 const AllGroupsContextMenu = () => {
+  const ctx = useContext(AppContext);
+  const [showCreate, setShowCreate] = useState(false);
+  const [name, setName] = useState();
+  const hideModal = () => setShowCreate(false);
+  let exn = null;
+  const [showError, setShowError] = useState(false);
+
+  const create = async e => {
+    setShowCreate(false);
+    try {
+      await fetch(`http://${ctx.addr[0]}/net/g/${name}`, {
+        method: 'PUT'
+      });
+    }
+    catch (e) {
+      exn = e;
+      setShowError(true);
+    }
+  }
+
   return (
     <ContextMenu id='all-groups-ctx'>
-      <MenuItem>
+      <MenuItem onClick={() => setShowCreate(true)}>
         Create a group
       </MenuItem>
+      <Modal show={showCreate} onHide={hideModal}>
+        <Modal.Header closeButton>
+          Create a group
+        </Modal.Header>
+        <Modal.Body>
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Text>Name</InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl placeholder='Group name' 
+            value={name} onChange={e => setName(e.target.value)}/>
+          </InputGroup>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant='outline-secondary' onClick={hideModal}>Cancel</Button>
+          <Button variant='outline-primary' onClick={create}>Create</Button>
+        </Modal.Footer>
+      </Modal>
+      <Error show={showError} setShow={setShowError} e={exn} />
     </ContextMenu>
   )
 }
 
 const Groups = () => {
   const ctx = useContext(AppContext);
+  const [groups, setGroups] = useState(null);
+
+  useEffect(() => {
+    const retrieveGroups = async () => {
+      if (ctx.addr[0] === null) {
+        setGroups(null);
+      }
+      else {
+        try {
+          const res = await fetch(`http://${ctx.addr[0]}/net/list`);
+          const data = await res.json();
+          setGroups(data);
+        }
+        catch (e) {
+          setGroups(null);
+        }
+      }
+    }
+
+    retrieveGroups();
+  }, [ctx.addr]);
+
   return (
     <Tab.Container>
       <Row>
         <Col sm={4}>
           <ContextMenuTrigger id='all-groups-ctx'>
             <Nav variant='pills' className='flex-column vh-100'>
-              {(ctx.groups || []).map(group => (
+              {(groups || []).map(group => (
                 <ContextMenuTrigger id='group-ctx' data={{ group: group }} 
                 collect={props => props}>
                   <Nav.Item>
@@ -107,7 +154,7 @@ const Groups = () => {
         </Col>
         <Col sm={8}>
           <Tab.Content>
-            {(ctx.groups || []).map(group => (
+            {(groups || []).map(group => (
               <Tab.Pane eventKey={group}>
                 <Members group={group} />
               </Tab.Pane>
