@@ -22,6 +22,7 @@ const MemberContextMenu = (props) => {
 
   const kick = async () => {
     try {
+      console.log(`http://${ctx.addr[0]}/net/g/${group}/m/${member}`);
       await fetch(`http://${ctx.addr[0]}/net/g/${group}/m/${member}`, {
         method: 'DELETE'
       });
@@ -42,13 +43,11 @@ const MemberContextMenu = (props) => {
   )
 }
 
-const ConnMemberContextMenu = connectMenu('member-ctx')(MemberContextMenu);
-
 const AllMembersContextMenu = (props) => {
   const ctx = useContext(AppContext);
   const [showAdd, setShowAdd] = useState(false);
-  const [name, setName] = useState();
-  const [addr, setAddr] = useState();
+  const [name, setName] = useState('');
+  const [addr, setAddr] = useState('');
   const hideModal = () => setShowAdd(false);
   let exn = null;
   const [showError, setShowError] = useState(false);
@@ -58,6 +57,9 @@ const AllMembersContextMenu = (props) => {
     try {
       await fetch(`http://${ctx.addr[0]}/net/g/${props.group}/m/${name}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           addr: addr
         })
@@ -70,8 +72,8 @@ const AllMembersContextMenu = (props) => {
   }
 
   return (
-    <ContextMenu id='all-members-ctx'>
-      <MenuItem>
+    <ContextMenu id={props.data.id}>
+      <MenuItem onClick={() => setShowAdd(true)}>
         Add a member
       </MenuItem>
       <Modal show={showAdd} onHide={hideModal}>
@@ -128,14 +130,19 @@ const Members = (props) => {
     retrieveMembers();
   }, [ctx.addr, props.group]);
 
+  const id1 = Math.random().toString();
+  const ConnMemberContextMenu = connectMenu(id1)(MemberContextMenu);
+  
+  const id2 = Math.random().toString();
+
   return (
     <Tab.Container>
       <Row>
         <Col sm={6}>
-          <ContextMenuTrigger id='all-members-ctx'>
+          <ContextMenuTrigger id={id2}>
             <Nav variant='pills' className='flex-column vh-100'>
               {(members || []).map(([name, addr], idx) => (
-                <ContextMenuTrigger id='member-ctx' data={{ 
+                <ContextMenuTrigger id={id1} data={{ 
                   group: props.group,
                   member: name
                 }} collect={props => props}>
@@ -149,7 +156,7 @@ const Members = (props) => {
               <ConnMemberContextMenu />
             </Nav>
           </ContextMenuTrigger>
-          <AllMembersContextMenu group={props.group}/>
+          <AllMembersContextMenu group={props.group} data={{id: id2}}/>
         </Col>
         <Col sm={6}>
           <Tab.Content>

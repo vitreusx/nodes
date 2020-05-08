@@ -51,7 +51,7 @@ class Router:
                 return 'No such group exists.', 500
             
             for _, addr in self.propagate(db[group]):
-                requests.delete(f'http://{addr}/notify/{group}')
+                requests.delete(f'http://{addr}/net/notify/{group}')
             notify_delete_group(group)
 
             return ''
@@ -75,11 +75,12 @@ class Router:
             if group in db:
                 return 'Node is already in such a group.'
             
-            db[group] = req.json()
+            db[group] = req.json
+            return ''
         
         @self.router.route('/notify/<group>/m/<member>', methods = ['PUT'])
         def notify_add_member(group, member):
-            db[group]['members'][member] = req.json()['addr']
+            db[group]['members'][member] = req.json['addr']
             return ''
 
         @self.router.route('/g/<group>/m/<member>', methods = ['PUT'])
@@ -91,21 +92,23 @@ class Router:
             if member in grp['members']:
                 return 'Member already exists.', 500
             
-            payload = req.json()
-            requests.post(f'http://{payload["addr"]}/notify/{group}/added', json={
+            notify_add_member(group, member)
+
+            payload = req.json
+            requests.post(f'http://{payload["addr"]}/net/notify/{group}/added', json={
                 'local': member,
                 'members': grp['members']
             })
             
             for _, addr in self.propagate(grp):
-                requests.put(f'http://{addr}/notify/{group}/m/{member}', json=payload)
-            notify_add_member(group, member)
+                requests.put(f'http://{addr}/net/notify/{group}/m/{member}', json=payload)
             
             return ''
 
         @self.router.route('/notify/<group>/m/<member>', methods = ['DELETE'])
         def notify_delete_member(group, member):
             del db[group]['members'][member]
+            return ''
 
         @self.router.route('/g/<group>/m/<member>', methods = ['DELETE'])
         def delete_member(group, member):
@@ -117,13 +120,13 @@ class Router:
                 return 'No such member exists.', 500
             
             for _, addr in self.propagate(grp):
-                requests.delete(f'http://{addr}/notify/{group}/m/{member}?local')
-            notify_delete_member(group, member)
+                requests.delete(f'http://{addr}/net/notify/{group}/m/{member}')
 
             if member == grp['local']:
                 del db[group]
             else:
-                requests.delete(f'http://{grp["members"][member]}/notify/{group}')
+                requests.delete(f'http://{grp["members"][member]}/net/notify/{group}')            
+                notify_delete_member(group, member)
             
             return ''
 

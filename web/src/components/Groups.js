@@ -28,7 +28,7 @@ const GroupContextMenu = (props) => {
     catch (e) {
       exn = e;
       setShowError(true);
-    }    
+    }
   }
 
   const destroy = async () => {
@@ -56,12 +56,10 @@ const GroupContextMenu = (props) => {
   )
 }
 
-const ConnGroupContextMenu = connectMenu('group-ctx')(GroupContextMenu);
-
-const AllGroupsContextMenu = () => {
+const AllGroupsContextMenu = (props) => {
   const ctx = useContext(AppContext);
   const [showCreate, setShowCreate] = useState(false);
-  const [name, setName] = useState();
+  const [name, setName] = useState('');
   const hideModal = () => setShowCreate(false);
   let exn = null;
   const [showError, setShowError] = useState(false);
@@ -80,7 +78,7 @@ const AllGroupsContextMenu = () => {
   }
 
   return (
-    <ContextMenu id='all-groups-ctx'>
+    <ContextMenu id={props.data.id}>
       <MenuItem onClick={() => setShowCreate(true)}>
         Create a group
       </MenuItem>
@@ -131,14 +129,18 @@ const Groups = () => {
     retrieveGroups();
   }, [ctx.addr]);
 
+  const id1 = Math.random().toString();
+  const id2 = Math.random().toString();
+  const ConnGroupContextMenu = connectMenu(id2)(GroupContextMenu);
+
   return (
     <Tab.Container>
       <Row>
         <Col sm={4}>
-          <ContextMenuTrigger id='all-groups-ctx'>
+          <ContextMenuTrigger id={id1}>
             <Nav variant='pills' className='flex-column vh-100'>
               {(groups || []).map(group => (
-                <ContextMenuTrigger id='group-ctx' data={{ group: group }} 
+                <ContextMenuTrigger id={id2} data={{ group: group }} 
                 collect={props => props}>
                   <Nav.Item>
                     <Nav.Link eventKey={group}>
@@ -150,7 +152,7 @@ const Groups = () => {
               <ConnGroupContextMenu />
             </Nav>
           </ContextMenuTrigger>
-          <AllGroupsContextMenu />
+          <AllGroupsContextMenu data={{id: id1}}/>
         </Col>
         <Col sm={8}>
           <Tab.Content>

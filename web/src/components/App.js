@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Switch, Route, Link, useLocation } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row';
+import { Helmet } from 'react-helmet';
 import Index from './Index';
 import General from './General';
 import Network from './Network';
 import Voice from './Voice';
 import Features from './Features';
-
+import AppContext from './AppContext';
 import './App.css';
 
 const labels = {
@@ -73,9 +74,14 @@ const Content = () => {
 
 const App = () => {
   const sidebarRoutes = ['/general', '/network', '/voice', '/features'];
+  const ctx = useContext(AppContext);
+  const [addr,] = ctx.addr;
 
   return (
     <div className='App'>
+      <Helmet>
+        <title>NC ({addr || 'N/A'})</title>
+      </Helmet>
       <Top name='Aurora' current={labels[useLocation().pathname]}/>
       <Container fluid>
         <Row>

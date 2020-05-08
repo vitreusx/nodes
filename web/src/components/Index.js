@@ -1,7 +1,11 @@
 import React from 'react';
 
-const Index = () => {
-  return <h2>Index Etale</h2>;
-}
+const Index = () => (
+  <div className='mt-3'>
+    <h2>
+      <em>Aurora</em> - Node Control
+    </h2>    
+  </div>
+)
 
 export default Index;
