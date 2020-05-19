@@ -1,6 +1,5 @@
 import setuptools
 
-
 setuptools.setup(
     name = 'node',
     version = '0',
