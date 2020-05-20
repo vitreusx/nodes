@@ -1,5 +1,6 @@
 import readline
 import requests
+import json
 
 
 class CommandLineInterface():
@@ -62,75 +63,68 @@ class CommandLineInterface():
     # functions in self.commands have to have docstring as help
 
 
+    def check_param_len(self, params, length):
+        if len(params) < length:
+            raise ValueError('Not enough parameters')
+        if len(params) > length:
+            raise ValueError('Too many parameters')
+        
+    
+    def send_request(self, request_func, url):
+        try:
+            response = request_func(url) 
+            if response.status_code != 200:
+                return 'Operation Failed'
+            else:
+                return 'Success'
+        except:
+            return f'Failed to connect to target {self.target}'
+            
+
+
     def do_group(self, params):
         '''Manage groups
            options:
            -a <group> <node> add node to group
            -r <group> <node> remove node from group
            -c <name> create new group
-           -d <name> delete group '''
+           -d <name> delete group 
+           -m <name> list members of the group'''
+
         if len(params) == 0:
             raise ValueError('Option not  given')
+
         if params[0] == '-c':
-            if len(params[1:]) == 0:
-                raise ValueError('Name not given')
-            if len(params[1:]) > 1:
-                raise ValueError('Too many parameters')
+            self.check_param_len(params[1:], 1)
             # add group named params[1]
             # TODO check name
-            try:
-                response = requests.put(f'http://{self.target}/net/g/{params[1]}') 
-                if response.status_code != 200:
-                    return 'Group already exists'
-                else:
-                    return 'Group created'
-            except:
-                return f'Failed to connect to target {self.target}'
+            return self.send_request(requests.put, f'http://{self.target}/net/g/{params[1]}')
             
         elif params[0] == '-d':
-            if len(params[1:]) == 0:
-                raise ValueError('Name not given')
-            if len(params[1:]) > 1:
-                raise ValueError('Too many parameters')
+            self.check_param_len(params[1:], 1)
             # add group named params[1]
             # TODO check name
-            try:
-                response = requests.delete(f'http://{self.target}/net/g/{params[1]}') 
-                if response.status_code != 200:
-                    return 'No such group'
-                else:
-                    return 'Group deleted'
-            except:
-                return f'Failed to connect to target {self.target}'
+            return self.send_request(requests.delete, f'http://{self.target}/net/g/{params[1]}')
+        
         elif params[0] == '-a':
-            if len(params[1:]) < 2:
-                raise ValueError('Name not given')
-            if len(params[1:]) > 2:
-                raise ValueError('Too many parameters')
+            self.check_param_len(params[1:], 2)
+            return self.send_request(requests.put, f'http://{self.target}/net/g/{params[1]}/m/{params[2]}') 
             
+        elif params[0] == '-r':
+            self.check_param_len(params[1:], 2)
+            return self.send_request(requests.delete, f'http://{self.target}/net/g/{params[1]}/m/{params[2]}') 
+        elif params[0] == '-m':
+            self.check_param_len(params[1:], 1)
             try:
-                response = requests.put(f'http://{self.target}/net/g/{params[1]}/m/{params[2]}') 
+                response = requests.get(f'http://{self.target}/net/g/{params[1]}') 
                 if response.status_code != 200:
-                    return 'Adding failed'
+                    return 'Operation Failed'
                 else:
-                    return 'Added node to group'
+                    members = [key + ' - ' + value for key, value in json.loads(response.text).items()]
+                    return '\n'.join(members)
             except:
                 return f'Failed to connect to target {self.target}'
 
-            
-        elif params[0] == '-r':
-            if len(params[1:]) < 2:
-                raise ValueError('Name not given')
-            if len(params[1:]) > 2:
-                raise ValueError('Too many parameters')
-            try:
-                response = requests.delete(f'http://{self.target}/net/g/{params[1]}/m/{params[2]}') 
-                if response.status_code != 200:
-                    return 'Removing failed'
-                else:
-                    return 'Removed node from group'
-            except:
-                return f'Failed to connect to target {self.target}'
         else:
             raise ValueError('Wrong option')
 
@@ -150,7 +144,8 @@ class CommandLineInterface():
     def do_list(self, params):
         ''' List ??? '''
         try:
-            return requests.get(f'http://{self.target}/net/list')
+            groups = json.loads(requests.get(f'http://{self.target}/net/groups').text)
+            return '\n'.join(groups)
         except:
             return f'Failed to connect to target {self.target}'
 
