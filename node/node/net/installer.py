@@ -100,4 +100,14 @@ class Installer:
 
         @nx.app.route('/net/proxy', methods=['POST'])
         def proxy():
-            return ''
+            targets = []
+            for meta in req.json['targets']:
+                if isinstance(meta, str):
+                    targets += [(meta, mem) for mem in network.group(meta).members()]
+                elif isinstance(meta, dict):
+                    for grp in meta:
+                        targets += [(grp, mem) for mem in meta[grp]]
+            
+            for grp, mem in targets:
+                url = f'http://{network.group(grp).member(mem)}{req.json["endpoint"]}'
+                requests.post(url, json=req.json['payload'])

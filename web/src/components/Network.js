@@ -18,7 +18,7 @@ const Network = () => {
   }
   
   return (
-    <Container fluid>
+    <Container>
       <Row className='justify-content-center'>
         <ButtonGroup className='mt-3 mb-3'>
           <Button variant='outline-primary' onClick={refresh}>Refresh</Button>

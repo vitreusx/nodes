@@ -1,4 +1,5 @@
 from flask import request as req, abort, url_for
+from flask_restful import Resource
 import json
 import speech_recognition as sr
 import requests
@@ -24,7 +25,7 @@ class Installer:
                 print(command)
 
                 phr = self.phrases.phrase(command)
-                requests.post(url_for(phr['endpoint']), json=phr['payload'])
+                requests.post(url_for(phr['endpoint'], _external=True), json=phr['payload'])
 
             except:
                 pass
@@ -35,8 +36,9 @@ class Installer:
                 with mic as src:
                     audio = rec.listen(src, phrase_time_limit=5)
                     callback(rec, audio)
-        
-    def validate(self, required):
+    
+    @staticmethod
+    def validate(required):
         if not req.json \
             or any(param not in req.json \
                     for param in required):
@@ -48,37 +50,36 @@ class Installer:
         self.phrases = Phrases(self.conf)
         self.enabled_cv = Condition()
         self.thr = Thread(target=self.voice_thread)
+        inst = self
 
-        @nx.app.route('/voice', methods=['GET'])
-        def check_voice():
-            return str(self.conf.enabled)
+        class Voice(Resource):
+            def get(self):
+                return inst.conf.enabled
+            
+            def post(self):
+                inst.conf.enabled = req.json['state']
+                with inst.enabled_cv:
+                    inst.enabled_cv.notify()
+        
+        nx.api.add_resource(Voice, '/voice')
 
-        @nx.app.route('/voice', methods=['POST'])
-        def set_voice():
-            self.validate(['state'])
-            self.conf.enabled = req.json['state']
-            self.enabled_cv.notify()
-            return ''
+        class PhraseList(Resource):
+            def get(self):
+                return inst.phrases.phrases()
+        
+        nx.api.add_resource(PhraseList, '/voice/phrases')
 
-        @nx.app.route('/voice/phrases', methods=['GET'])
-        def get_phrases():
-            return json.dumps(self.phrases.phrases())
+        class Phrase(Resource):
+            def get(self, phrase):
+                return inst.phrases.phrase(phrase)
+            
+            def put(self, phrase):
+                inst.phrases.db[phrase] = {
+                    'endpoint': req.json['endpoint'],
+                    'payload': req.json['payload']
+                }
+            
+            def delete(self, phrase):
+                inst.phrases.remove(phrase)
 
-        @nx.app.route('/voice/phrase', methods=['PUT'])
-        def add_phrase():
-            self.validate(['phrase', 'endpoint', 'payload'])
-
-            if self.phrases.create(req.json['phrase'], \
-                req.json['endpoint'], req.json['payload']):
-                return ''
-            else:
-                return 'Phrase already registered', 400
-
-        @nx.app.route('/voice/phrase', methods=['DELETE'])
-        def remove_phrase():
-            self.validate(['phrase'])
-
-            if self.phrases.remove(req['phrase']):
-                return ''
-            else:
-                return 'No such phrase is registered', 204
+        nx.api.add_resource(Phrase, '/voice/p/<phrase>')
