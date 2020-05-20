@@ -1,4 +1,4 @@
-from cli import CommandLineInterface
+from .cli import CommandLineInterface
 
 if __name__ == '__main__':
     cli = CommandLineInterface()
