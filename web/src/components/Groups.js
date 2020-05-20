@@ -29,6 +29,7 @@ const GroupContextMenu = (props) => {
       exn = e;
       setShowError(true);
     }
+    ctx.refresh[1](ctx.refresh[0]+1);
   }
 
   const destroy = async () => {
@@ -41,6 +42,7 @@ const GroupContextMenu = (props) => {
       exn = e;
       setShowError(true);
     }
+    ctx.refresh[1](ctx.refresh[0]+1);
   }
 
   return (
@@ -75,6 +77,7 @@ const AllGroupsContextMenu = (props) => {
       exn = e;
       setShowError(true);
     }
+    ctx.refresh[1](ctx.refresh[0]+1);
   }
 
   return (
@@ -127,7 +130,7 @@ const Groups = () => {
     }
 
     retrieveGroups();
-  }, [ctx.addr]);
+  }, [ctx.addr, ctx.refresh]);
 
   const id1 = Math.random().toString();
   const id2 = Math.random().toString();
@@ -136,6 +139,7 @@ const Groups = () => {
   return (
     <Tab.Container>
       <Row>
+        <Col sm={2}></Col>
         <Col sm={4}>
           <ContextMenuTrigger id={id1}>
             <Nav variant='pills' className='flex-column vh-100'>
@@ -154,7 +158,7 @@ const Groups = () => {
           </ContextMenuTrigger>
           <AllGroupsContextMenu data={{id: id1}}/>
         </Col>
-        <Col sm={8}>
+        <Col sm={4}>
           <Tab.Content>
             {groups.map(group => (
               <Tab.Pane eventKey={group}>
@@ -163,6 +167,7 @@ const Groups = () => {
             ))}
           </Tab.Content>
         </Col>
+        <Col sm={2}></Col>
       </Row>
     </Tab.Container>
   )

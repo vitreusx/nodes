@@ -4,9 +4,11 @@ const AppContext = React.createContext();
 
 export const AppProvider = ({ children }) => {
   const [addr, setAddr] = useState(null);
+  const [refresh, setRefresh] = useState(0);
 
   const state = {
-    addr: [addr, setAddr]
+    addr: [addr, setAddr],
+    refresh: [refresh, setRefresh]
   }
 
   return (
