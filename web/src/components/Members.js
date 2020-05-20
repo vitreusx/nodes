@@ -8,7 +8,6 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 import AppContext from './AppContext';
-import MemberPane from './MemberPane';
 import Error from './Error';
 import { ContextMenu, MenuItem, ContextMenuTrigger, connectMenu } from 'react-contextmenu';
 
@@ -122,7 +121,7 @@ const Members = (props) => {
     }
 
     retrieveMembers();
-  }, [ctx.addr, props.group]);
+  }, [ctx.addr, ctx.refresh, props.group]);
 
   const id1 = Math.random().toString();
   const ConnMemberContextMenu = connectMenu(id1)(MemberContextMenu);
@@ -132,7 +131,7 @@ const Members = (props) => {
   return (
     <Tab.Container>
       <Row>
-        <Col sm={6}>
+        <Col sm={12}>
           <ContextMenuTrigger id={id2}>
             <Nav variant='pills' className='flex-column vh-100'>
               {members.map(([name, addr], idx) => (
@@ -151,15 +150,6 @@ const Members = (props) => {
             </Nav>
           </ContextMenuTrigger>
           <AllMembersContextMenu group={props.group} data={{id: id2}}/>
-        </Col>
-        <Col sm={6}>
-          <Tab.Content>
-            {members.map(([name, addr], idx) => (
-              <Tab.Pane eventKey={name}>
-                <MemberPane group={props.group} member={name} />
-              </Tab.Pane>
-            ))}
-          </Tab.Content>
         </Col>
       </Row>``
     </Tab.Container>

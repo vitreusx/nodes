@@ -1,108 +1,50 @@
-# Overview
+# SITREP
 
 ## `/net` endpoints
 
 ```http
 GET /net/groups
-Payload: auth
 Result: List[str]
-> 200 OK
-> 401 Unauthorized
 ```
-Get a list of groups for the node.
+Get a list of groups (or rather their names) for the node.
 
 ```http
-PUT /net/group
-Payload: name
-> 201 Created
-> 400 Bad Request [when group exists?]
-> 401 Unauthorized
+PUT /net/g/<group>
 ```
 Create a new group.
 
 ```http
-DELETE /net/group
-Payload: name
-> 200 OK
-> 204 No Content
-> 401 Unauthorized
+DELETE /net/g/<group>
 ```
-Delete the group.
+Delete a group.
 
 ```http
-GET /net/group/members
-Payload: group
+GET /net/g/<group>
 Result: Dict[str, str] (member name -> member addr)
-> 200 OK
-> 401 Unauthorized
 ```
 List members of a group.
 
 ```http
-PUT /net/group/member
-Payload: group, name, addr
-> 201 Created
-> 400 Bad Request [when member exists?]
-> 401 Unauthorized
+PUT /net/g/<group>/m/<member>
 ```
 Add a node to the group.
 
 ```http
-DELETE /net/group/member
-Payload: group, name
-> 200 OK
-> 204 No Content
-> 401 Unauthorized
+DELETE /net/g/<group>/m/<member>
 ```
 Remove a node from a group.
 
 ```http
-POST /net/group/leave
-Payload: group
-> 200 OK
-> 401 Unauthorized
+POST /net/g/<group>/leave
 ```
 Leave a group.
 
 ```http
 POST /net/proxy
-Payload: group, member, endpoint, payload
-Result: any
-> 200 OK
-> 401 Unauthorized
+Payload: targets, endpoint, payload
+Result: any?
 ```
-Execute command at endpoint with a specified payload for a given member in a given group. [[Need to revise?]]
+Execute command at endpoint with a specified payload for given targets. [[Need to revise?]]
 
-## `/tasks` endpoints
-
-```http
-GET /tasks/list
-Result: List[str] (list of endpoints?)
-> 200 OK
-> 401 Unauthorized
-```
-Lists available tasks.
-
-```http
-GET /tasks/info
-Payload: endpoint
-Result: { endpoint: ..., name: ..., description: ... } or something like that?
-> 200 OK
-> 401 Unauthorized
-```
-Gets additional info about a task.
-
-```http
-POST /tasks/task
-Payload: endpoint
-> 200 OK
-> 401 Unauthorized
-```
-Instructs server to perform a specified task.
-
-## Notes
-
-- All methods should be accessible from other node modules;
-- Authorization: token based via Authorization HTTP header? need to think about it;
-- How to automatically notify dashboard of the changes?;
-- Do we want voice API (like turning on/off etc?);
+### Notes:
+- there are also private endpoints (not sure whether we should document them).

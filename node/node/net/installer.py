@@ -53,7 +53,7 @@ class Installer:
 
         class Member(Resource):
             def get(self, group, member):
-                return fetch_group(group).members(member)
+                return fetch_group(group).member(member)
             
             def put(self, group, member):
                 g = fetch_group(group)
