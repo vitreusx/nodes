@@ -9,6 +9,7 @@ class CommandLineInterface():
         # TODO something more reasonable
         self.target = 'localhost:8080'
         self.commands = {
+            'do' : self.do_execute,
             'group' : self.do_group,
             'hello' : self.do_hello, 
             'help' : self.do_help, 
@@ -81,6 +82,15 @@ class CommandLineInterface():
         except:
             return f'Failed to connect to target {self.target}'
             
+    
+    def do_execute(self, params):
+        self.check_param_len(params, 1)
+        command = requests.get(f'http://{self.target}/voice/phrase', json={'phrase': params[0]})
+        if command.status_code != 200:
+            return 'No such command'
+        phrase = json.loads(command.text)
+        endpoint = phrase['endpoint']
+        requests.post(f'http://{self.target}{endpoint}') 
 
 
     def do_group(self, params):
