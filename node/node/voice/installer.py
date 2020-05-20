@@ -25,7 +25,7 @@ class Installer:
                 print(command)
 
                 phr = self.phrases.phrase(command)
-                requests.post(url_for(phr['endpoint'], _external=True), json=phr['payload'])
+                requests.post(req.url_root + phr['endpoint'], json=phr['payload'])
 
             except:
                 pass
@@ -78,6 +78,10 @@ class Installer:
                     'endpoint': req.json['endpoint'],
                     'payload': req.json['payload']
                 }
+
+            def post(self, phrase):
+                phr = inst.phrases.phrase(phrase)
+                requests.post(req.url_root + phr['endpoint'], json=phr['payload'])
             
             def delete(self, phrase):
                 inst.phrases.remove(phrase)
