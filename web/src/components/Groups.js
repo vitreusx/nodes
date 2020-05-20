@@ -21,8 +21,14 @@ const GroupContextMenu = (props) => {
 
   const leave = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/net/g/${group}/leave`, {
-        method: 'POST'
+      await fetch(`http://${ctx.addr[0]}/net/group/leave`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          group: group
+        })
       });
     }
     catch (e) {
@@ -33,8 +39,14 @@ const GroupContextMenu = (props) => {
 
   const destroy = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/net/g/${group}`, {
-        method: 'DELETE'
+      await fetch(`http://${ctx.addr[0]}/net/group`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          group: group
+        })
       });
     }
     catch (e) {
@@ -67,8 +79,14 @@ const AllGroupsContextMenu = (props) => {
   const create = async e => {
     setShowCreate(false);
     try {
-      await fetch(`http://${ctx.addr[0]}/net/g/${name}`, {
-        method: 'PUT'
+      await fetch(`http://${ctx.addr[0]}/net/group`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          group: name
+        })
       });
     }
     catch (e) {
@@ -116,7 +134,7 @@ const Groups = () => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/net/list`);
+          const res = await fetch(`http://${ctx.addr[0]}/net/groups`);
           const data = await res.json();
           setGroups(data);
         }

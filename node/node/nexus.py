@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_restful import Api
 from dataclasses import dataclass
 import argparse as ap
 import yaml
@@ -9,6 +10,7 @@ class Nexus:
     app: Flask
     cors: CORS
     conf: any
+    api: Api
 
     def __init__(self):
         parser = ap.ArgumentParser('node')
@@ -16,6 +18,7 @@ class Nexus:
             help='path to the static config file')
 
         self.app = Flask(__name__)
+        self.api = Api(self.app)
         self.cors = CORS(self.app)
         args = parser.parse_args()
         try:

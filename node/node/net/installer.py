@@ -1,72 +1,60 @@
 from ..nexus import Nexus
 from .config import Config
 from .network import Network
-from flask import request as req, abort
+from flask import request as req, abort, url_for
+from flask_restful import Resource
+import requests
 import json
 
 class Installer:
-    def validate(self, required):
-        if not req.json \
-            or any(param not in req.json \
-                    for param in required):
-            abort(404)
-    
-    def group(self):
-        rv = self.network.group(req.json['group'])
-        if not rv:
-            abort(204)
-        return rv
-
     def __init__(self, nx: Nexus):
-        self.nx = nx
-        self.conf = Config(nx.conf.get('net') or {})
-        self.network = Network(self.conf)
+        conf = Config(nx.conf.get('net') or {})
+        network = Network(conf)
 
-        @nx.app.route('/net/list', methods=['GET'])
-        def list_groups():
-            return json.dumps(self.network.groups())
+        @nx.app.route('/net/groups', methods=['GET'])
+        def groups():
+            return json.dumps(network.groups())
 
-        @nx.app.route('/net/group', methods=['PUT'])
-        def create_group():
-            self.validate(['group'])
+        class Group(Resource):
+            def get(self, group):
+                return network.group(group).members()
             
-            if self.network.create(req.json['group']):
-                return '', 201
-            else:
-                return 'Group exists', 400
-
-        @nx.app.route('/net/group', methods=['DELETE'])
-        def delete_group():
-            self.validate(['group'])
+            def put(self, group):
+                if not network.create(group):
+                    return False
+                network.group(group).invite(conf.name, conf.addr)
             
-            if self.network.erase(req.json['group']):
-                return ''
-            else:
-                return 'No such group exists', 204
+            def delete(self, group):
+                return network.erase(group)
 
-        @nx.app.route('/net/group/members', methods=['GET'])
-        def list_members():
-            self.validate(['group'])
-            group = self.group()
+        nx.api.add_resource(Group, '/net/g/<group>', endpoint='api.group')
+        
+        class Member(Resource):
+            def group(self, group):
+                rv = network.group(group)
+                if not rv:
+                    abort(404, f'Group {group} does not exist.')
+                return rv
             
-            return json.dumps(group.members())
+            def get(self, group, member):
+                g = self.group(group)
+                return g.members(member)
+            
+            def put(self, group, member):
+                g = self.group(group)
+                return g.invite(member)
+            
+            def delete(self, group, member):
+                g = self.group(group)
+                return g.kick(member)
 
-        @nx.app.route('/net/group/member', methods=['PUT'])
-        def invite_member():
-            self.validate(['group', 'name', 'addr'])
-            group = self.group()
-            
-            if group.invite(req.json['name'], req.json['addr']):
-                return '', 201
-            else:
-                return 'Member already present', 400
+        nx.api.add_resource(Member, '/net/g/<group>/m/<member>', endpoint='api.member')
 
-        @nx.app.route('/net/group/member', methods=['DELETE'])
-        def kick_member():
-            self.validate(['group', 'name'])
-            group = self.group()
-            
-            if group.kick(req.json['name']):
-                return ''
-            else:
-                return 'No such member is present', 204
+        @nx.app.route('/net/g/<group>/leave', methods=['POST'])
+        def leave(group):
+            g = network.db.get(group)
+            if not g:
+                abort(404, f'Group {group} does not exist.')
+            ur = url_for('api.member', group=group, member=g['local'], _external=True)
+            r = requests.delete(ur)
+            return r.content, r.status_code

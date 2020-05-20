@@ -7,12 +7,6 @@ from .config import Config
 class Group:
     def __init__(self, group):
         self.group = group
-    
-    @staticmethod
-    def empty():
-        return {
-            'members': {}
-        }
 
     def members(self) -> Dict[str, str]:
         return self.group['members']
@@ -50,8 +44,12 @@ class Network:
         if group in self.db:
             return
         
-        self.db[group] = Group.empty()
-        self.group(group).invite(self.conf.name, self.conf.addr)
+        self.db[group] = {
+            'local': self.conf.name,
+            'members': {
+                self.conf.name: self.conf.addr
+            }
+        }
         return self.group(group)
 
     def erase(self, group):

@@ -22,9 +22,15 @@ const MemberContextMenu = (props) => {
 
   const kick = async () => {
     try {
-      console.log(`http://${ctx.addr[0]}/net/g/${group}/m/${member}`);
-      await fetch(`http://${ctx.addr[0]}/net/g/${group}/m/${member}`, {
-        method: 'DELETE'
+      await fetch(`http://${ctx.addr[0]}/net/group/member`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          group: group,
+          name: member
+        })
       });
     }
     catch (e) {
@@ -55,12 +61,14 @@ const AllMembersContextMenu = (props) => {
   const add = async e => {
     setShowAdd(false);
     try {
-      await fetch(`http://${ctx.addr[0]}/net/g/${props.group}/m/${name}`, {
+      await fetch(`http://${ctx.addr[0]}/net/group/member`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          group: props.group,
+          name: name,
           addr: addr
         })
       });
@@ -117,7 +125,16 @@ const Members = (props) => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/net/g/${props.group}/list`);
+          console.log(JSON.stringify({
+            group: props.group
+          }))
+          const res = await fetch(`http://${ctx.addr[0]}/net/group/members`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: "{}"
+          });
           const data = await res.json();
           setMembers(Object.entries(data));
         }
