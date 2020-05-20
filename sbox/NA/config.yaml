@@ -1,3 +1,5 @@
-modules:
-  net:
-    name: 'NA'
+port: 8080
+net:
+  name: 'NA'
+local:
+- 'tasks'

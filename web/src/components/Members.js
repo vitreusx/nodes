@@ -55,14 +55,8 @@ const AllMembersContextMenu = (props) => {
   const add = async e => {
     setShowAdd(false);
     try {
-      await fetch(`http://${ctx.addr[0]}/net/g/${props.group}/m/${name}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          addr: addr
-        })
+      await fetch(`http://${ctx.addr[0]}/net/g/${props.group}/m/${name}?addr=${addr}`, {
+        method: 'PUT'
       });
     }
     catch (e) {
@@ -108,21 +102,21 @@ const AllMembersContextMenu = (props) => {
 
 const Members = (props) => {
   const ctx = useContext(AppContext);
-  const [members, setMembers] = useState(null);
+  const [members, setMembers] = useState([]);
 
   useEffect(() => {
     const retrieveMembers = async () => {
       if (ctx.addr[0] === null) {
-        setMembers(null);
+        setMembers([]);
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/net/g/${props.group}/list`);
+          const res = await fetch(`http://${ctx.addr[0]}/net/g/${props.group}`);
           const data = await res.json();
           setMembers(Object.entries(data));
         }
         catch (e) {
-          setMembers(null);
+          setMembers([]);
         }
       }
     }
@@ -141,7 +135,7 @@ const Members = (props) => {
         <Col sm={6}>
           <ContextMenuTrigger id={id2}>
             <Nav variant='pills' className='flex-column vh-100'>
-              {(members || []).map(([name, addr], idx) => (
+              {members.map(([name, addr], idx) => (
                 <ContextMenuTrigger id={id1} data={{ 
                   group: props.group,
                   member: name
@@ -160,7 +154,7 @@ const Members = (props) => {
         </Col>
         <Col sm={6}>
           <Tab.Content>
-            {(members || []).map(([name, addr], idx) => (
+            {members.map(([name, addr], idx) => (
               <Tab.Pane eventKey={name}>
                 <MemberPane group={props.group} member={name} />
               </Tab.Pane>

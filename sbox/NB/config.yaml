@@ -1,4 +1,5 @@
 port: 8081
-modules:
-  net:
-    name: 'NB'
+net:
+  name: 'NB'
+local:
+- 'tasks'
