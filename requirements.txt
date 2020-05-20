@@ -26,8 +26,8 @@ MarkupSafe==1.1.1
 marshmallow==3.5.2
 marshmallow-sqlalchemy==0.23.0
 mccabe==0.6.1
--e git+https://gitlab.com/vitreus/io@ad229f940a14002350e55addf7152aa22652abb6#egg=node&subdirectory=node
--e git+https://gitlab.com/vitreus/io@ad229f940a14002350e55addf7152aa22652abb6#egg=node_cli&subdirectory=node-cli
+-e git+https://gitlab.com/vitreus/io@28e63bb9d8a12a5b50df80e0bbd800c2026afa43#egg=node&subdirectory=node
+-e git+https://gitlab.com/vitreus/io@28e63bb9d8a12a5b50df80e0bbd800c2026afa43#egg=node_cli&subdirectory=node-cli
 oauth2client==4.1.3
 protobuf==3.11.3
 pyasn1==0.4.8
