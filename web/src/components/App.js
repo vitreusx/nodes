@@ -9,7 +9,6 @@ import Index from './Index';
 import General from './General';
 import Network from './Network';
 import Voice from './Voice';
-import Features from './Features';
 import AppContext from './AppContext';
 import './App.css';
 
@@ -17,8 +16,7 @@ const labels = {
   '/': 'Index',
   '/general': 'General',
   '/network': 'Network',
-  '/voice': 'Voice',
-  '/features': 'Features'
+  '/voice': 'Voice'
 };
 
 const Top = (props) => {
@@ -65,7 +63,6 @@ const Content = () => {
         <Route path='/general' component={General} />
         <Route path='/network' component={Network} />
         <Route path='/voice' component={Voice} />
-        <Route path='/features' component={Features} />
         <Route path='/' component={Index} />
       </Switch>
     </main>
@@ -73,7 +70,7 @@ const Content = () => {
 }
 
 const App = () => {
-  const sidebarRoutes = ['/general', '/network', '/voice', '/features'];
+  const sidebarRoutes = ['/general', '/network', '/voice'];
   const ctx = useContext(AppContext);
   const [addr,] = ctx.addr;
 

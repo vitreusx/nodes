@@ -29,6 +29,7 @@ const GroupContextMenu = (props) => {
       exn = e;
       setShowError(true);
     }
+    ctx.refresh[1](ctx.refresh[0]+1);
   }
 
   const destroy = async () => {
@@ -41,6 +42,7 @@ const GroupContextMenu = (props) => {
       exn = e;
       setShowError(true);
     }
+    ctx.refresh[1](ctx.refresh[0]+1);
   }
 
   return (
@@ -75,6 +77,7 @@ const AllGroupsContextMenu = (props) => {
       exn = e;
       setShowError(true);
     }
+    ctx.refresh[1](ctx.refresh[0]+1);
   }
 
   return (

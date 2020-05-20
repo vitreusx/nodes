@@ -2,7 +2,7 @@
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>Overview</title>
+        <title>SITREP</title>
         
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
@@ -21,89 +21,39 @@
         
     </head>
     <body class="vscode-light">
-        <h1 id="overview">Overview</h1>
+        <h1 id="sitrep">SITREP</h1>
 <h2 id="net-endpoints"><code>/net</code> endpoints</h2>
 <pre><code class="language-http"><div><span class="hljs-attribute">GET /net/groups
-Payload</span>: auth
-<span class="hljs-attribute">Result</span>: List[str]
-&gt; <span class="hljs-attribute">200 OK
-&gt; 401 Unauthorized
-</span></div></code></pre>
-<p>Get a list of groups for the node.</p>
-<pre><code class="language-http"><div><span class="hljs-attribute">PUT /net/group
-Payload</span>: name
-&gt; <span class="hljs-attribute">201 Created
-&gt; 400 Bad Request [when group exists?]
-&gt; 401 Unauthorized
+Result</span>: List[str]
+</div></code></pre>
+<p>Get a list of groups (or rather their names) for the node.</p>
+<pre><code class="language-http"><div><span class="hljs-attribute">PUT /net/g/&lt;group&gt;
 </span></div></code></pre>
 <p>Create a new group.</p>
-<pre><code class="language-http"><div><span class="hljs-attribute">DELETE /net/group
-Payload</span>: name
-&gt; <span class="hljs-attribute">200 OK
-&gt; 204 No Content
-&gt; 401 Unauthorized
+<pre><code class="language-http"><div><span class="hljs-attribute">DELETE /net/g/&lt;group&gt;
 </span></div></code></pre>
-<p>Delete the group.</p>
-<pre><code class="language-http"><div><span class="hljs-attribute">GET /net/group/members
-Payload</span>: group
-<span class="hljs-attribute">Result</span>: Dict[str, str] (member name -&gt; member addr)
-&gt; <span class="hljs-attribute">200 OK
-&gt; 401 Unauthorized
-</span></div></code></pre>
+<p>Delete a group.</p>
+<pre><code class="language-http"><div><span class="hljs-attribute">GET /net/g/&lt;group&gt;
+Result</span>: Dict[str, str] (member name -&gt; member addr)
+</div></code></pre>
 <p>List members of a group.</p>
-<pre><code class="language-http"><div><span class="hljs-attribute">PUT /net/group/member
-Payload</span>: group, name, addr
-&gt; <span class="hljs-attribute">201 Created
-&gt; 400 Bad Request [when member exists?]
-&gt; 401 Unauthorized
+<pre><code class="language-http"><div><span class="hljs-attribute">PUT /net/g/&lt;group&gt;/m/&lt;member&gt;
 </span></div></code></pre>
 <p>Add a node to the group.</p>
-<pre><code class="language-http"><div><span class="hljs-attribute">DELETE /net/group/member
-Payload</span>: group, name
-&gt; <span class="hljs-attribute">200 OK
-&gt; 204 No Content
-&gt; 401 Unauthorized
+<pre><code class="language-http"><div><span class="hljs-attribute">DELETE /net/g/&lt;group&gt;/m/&lt;member&gt;
 </span></div></code></pre>
 <p>Remove a node from a group.</p>
-<pre><code class="language-http"><div><span class="hljs-attribute">POST /net/group/leave
-Payload</span>: group
-&gt; <span class="hljs-attribute">200 OK
-&gt; 401 Unauthorized
+<pre><code class="language-http"><div><span class="hljs-attribute">POST /net/g/&lt;group&gt;/leave
 </span></div></code></pre>
 <p>Leave a group.</p>
 <pre><code class="language-http"><div><span class="hljs-attribute">POST /net/proxy
-Payload</span>: group, member, endpoint, payload
-<span class="hljs-attribute">Result</span>: any
-&gt; <span class="hljs-attribute">200 OK
-&gt; 401 Unauthorized
-</span></div></code></pre>
-<p>Execute command at endpoint with a specified payload for a given member in a given group. [[Need to revise?]]</p>
-<h2 id="tasks-endpoints"><code>/tasks</code> endpoints</h2>
-<pre><code class="language-http"><div><span class="hljs-attribute">GET /tasks/list
-Result</span>: List[str] (list of endpoints?)
-&gt; <span class="hljs-attribute">200 OK
-&gt; 401 Unauthorized
-</span></div></code></pre>
-<p>Lists available tasks.</p>
-<pre><code class="language-http"><div><span class="hljs-attribute">GET /tasks/info
-Payload</span>: endpoint
-<span class="hljs-attribute">Result</span>: { endpoint: ..., name: ..., description: ... } or something like that?
-&gt; <span class="hljs-attribute">200 OK
-&gt; 401 Unauthorized
-</span></div></code></pre>
-<p>Gets additional info about a task.</p>
-<pre><code class="language-http"><div><span class="hljs-attribute">POST /tasks/task
-Payload</span>: endpoint
-&gt; <span class="hljs-attribute">200 OK
-&gt; 401 Unauthorized
-</span></div></code></pre>
-<p>Instructs server to perform a specified task.</p>
-<h2 id="notes">Notes</h2>
+Payload</span>: targets, endpoint, payload
+<span class="hljs-attribute">Result</span>: any?
+</div></code></pre>
+<p>Execute command at endpoint with a specified payload for given targets. [[Need to revise?]]</p>
+<h3 id="notes">Notes:</h3>
 <ul>
-<li>All methods should be accessible from other node modules;</li>
-<li>Authorization: token based via Authorization HTTP header? need to think about it;</li>
-<li>How to automatically notify dashboard of the changes?;</li>
-<li>Do we want voice API (like turning on/off etc?);</li>
+<li>there are also private endpoints (not sure whether we should document them).</li>
 </ul>
 
     </body>

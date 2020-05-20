@@ -30,6 +30,7 @@ const MemberContextMenu = (props) => {
       exn = e;
       setShowError(true);
     }
+    ctx.refresh[1](ctx.refresh[0]+1);
   }
 
   return (
@@ -62,6 +63,7 @@ const AllMembersContextMenu = (props) => {
       exn = e;
       setShowError(true);
     }
+    ctx.refresh[1](ctx.refresh[0]+1);
   }
 
   return (
