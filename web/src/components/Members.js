@@ -22,15 +22,9 @@ const MemberContextMenu = (props) => {
 
   const kick = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/net/group/member`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          group: group,
-          name: member
-        })
+      console.log(`http://${ctx.addr[0]}/net/g/${group}/m/${member}`);
+      await fetch(`http://${ctx.addr[0]}/net/g/${group}/m/${member}`, {
+        method: 'DELETE'
       });
     }
     catch (e) {
@@ -61,16 +55,8 @@ const AllMembersContextMenu = (props) => {
   const add = async e => {
     setShowAdd(false);
     try {
-      await fetch(`http://${ctx.addr[0]}/net/group/member`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          group: props.group,
-          name: name,
-          addr: addr
-        })
+      await fetch(`http://${ctx.addr[0]}/net/g/${props.group}/m/${name}?addr=${addr}`, {
+        method: 'PUT'
       });
     }
     catch (e) {
@@ -116,30 +102,21 @@ const AllMembersContextMenu = (props) => {
 
 const Members = (props) => {
   const ctx = useContext(AppContext);
-  const [members, setMembers] = useState(null);
+  const [members, setMembers] = useState([]);
 
   useEffect(() => {
     const retrieveMembers = async () => {
       if (ctx.addr[0] === null) {
-        setMembers(null);
+        setMembers([]);
       }
       else {
         try {
-          console.log(JSON.stringify({
-            group: props.group
-          }))
-          const res = await fetch(`http://${ctx.addr[0]}/net/group/members`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: "{}"
-          });
+          const res = await fetch(`http://${ctx.addr[0]}/net/g/${props.group}`);
           const data = await res.json();
           setMembers(Object.entries(data));
         }
         catch (e) {
-          setMembers(null);
+          setMembers([]);
         }
       }
     }
@@ -158,7 +135,7 @@ const Members = (props) => {
         <Col sm={6}>
           <ContextMenuTrigger id={id2}>
             <Nav variant='pills' className='flex-column vh-100'>
-              {(members || []).map(([name, addr], idx) => (
+              {members.map(([name, addr], idx) => (
                 <ContextMenuTrigger id={id1} data={{ 
                   group: props.group,
                   member: name
@@ -177,7 +154,7 @@ const Members = (props) => {
         </Col>
         <Col sm={6}>
           <Tab.Content>
-            {(members || []).map(([name, addr], idx) => (
+            {members.map(([name, addr], idx) => (
               <Tab.Pane eventKey={name}>
                 <MemberPane group={props.group} member={name} />
               </Tab.Pane>

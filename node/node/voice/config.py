@@ -8,4 +8,4 @@ class Config:
     backend: str = 'google'
 
     def __init__(self, conf):
-        self.__dict__.update(conf.get('voice') or {})
+        self.__dict__.update(conf)

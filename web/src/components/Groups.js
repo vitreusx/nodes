@@ -21,14 +21,8 @@ const GroupContextMenu = (props) => {
 
   const leave = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/net/group/leave`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          group: group
-        })
+      await fetch(`http://${ctx.addr[0]}/net/g/${group}/leave`, {
+        method: 'POST'
       });
     }
     catch (e) {
@@ -39,14 +33,8 @@ const GroupContextMenu = (props) => {
 
   const destroy = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/net/group`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          group: group
-        })
+      await fetch(`http://${ctx.addr[0]}/net/g/${group}`, {
+        method: 'DELETE'
       });
     }
     catch (e) {
@@ -79,14 +67,8 @@ const AllGroupsContextMenu = (props) => {
   const create = async e => {
     setShowCreate(false);
     try {
-      await fetch(`http://${ctx.addr[0]}/net/group`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          group: name
-        })
+      await fetch(`http://${ctx.addr[0]}/net/g/${name}`, {
+        method: 'PUT'
       });
     }
     catch (e) {
@@ -125,12 +107,12 @@ const AllGroupsContextMenu = (props) => {
 
 const Groups = () => {
   const ctx = useContext(AppContext);
-  const [groups, setGroups] = useState(null);
+  const [groups, setGroups] = useState([]);
 
   useEffect(() => {
     const retrieveGroups = async () => {
       if (ctx.addr[0] === null) {
-        setGroups(null);
+        setGroups([]);
       }
       else {
         try {
@@ -139,7 +121,7 @@ const Groups = () => {
           setGroups(data);
         }
         catch (e) {
-          setGroups(null);
+          setGroups([]);
         }
       }
     }
@@ -157,7 +139,7 @@ const Groups = () => {
         <Col sm={4}>
           <ContextMenuTrigger id={id1}>
             <Nav variant='pills' className='flex-column vh-100'>
-              {(groups || []).map(group => (
+              {groups.map(group => (
                 <ContextMenuTrigger id={id2} data={{ group: group }} 
                 collect={props => props}>
                   <Nav.Item>
@@ -174,7 +156,7 @@ const Groups = () => {
         </Col>
         <Col sm={8}>
           <Tab.Content>
-            {(groups || []).map(group => (
+            {groups.map(group => (
               <Tab.Pane eventKey={group}>
                 <Members group={group} />
               </Tab.Pane>

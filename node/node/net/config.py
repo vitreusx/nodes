@@ -19,5 +19,5 @@ class Config:
     addr: str = 'localhost:8080'
 
     def __init__(self, conf):
-        self.__dict__.update(conf.get('net') or {})
+        self.__dict__.update(conf or {})
         self.addr = f'{get_ip()}:{conf.get("port") or 8080}'

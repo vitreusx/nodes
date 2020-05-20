@@ -44,7 +44,7 @@ class Installer:
     
     def __init__(self, nx: Nexus):
         self.nx = nx
-        self.conf = Config(nx.conf)
+        self.conf = Config(nx.conf.get('voice') or {})
         self.phrases = Phrases(self.conf)
         self.enabled_cv = Condition()
         self.thr = Thread(target=self.voice_thread)
