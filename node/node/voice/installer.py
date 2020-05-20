@@ -64,6 +64,14 @@ class Installer:
         def get_phrases():
             return json.dumps(self.phrases.phrases())
 
+#        @nx.app.route('/voice/phrase', methods=['GET'])
+#        def get_phrases():
+#            phrase = [phrase for phrase in self.phrases.phrases() if phrase == req.json['phrase']]
+#            if len(phrase) == 0:
+#                return 'No such phrase is registered', 204
+#            else:
+#                return json.dumps(phrase)
+#
         @nx.app.route('/voice/phrase', methods=['PUT'])
         def add_phrase():
             self.validate(['phrase', 'endpoint', 'payload'])
@@ -78,7 +86,7 @@ class Installer:
         def remove_phrase():
             self.validate(['phrase'])
 
-            if self.phrases.remove(req['phrase']):
+            if self.phrases.remove(req.json['phrase']):
                 return ''
             else:
                 return 'No such phrase is registered', 204

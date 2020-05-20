@@ -13,6 +13,7 @@ class CommandLineInterface():
             'hello' : self.do_hello, 
             'help' : self.do_help, 
             'list' : self.do_list, 
+            'voice' : self.do_voice,
             'quit' : self.do_quit, 
         }
         
@@ -70,9 +71,9 @@ class CommandLineInterface():
             raise ValueError('Too many parameters')
         
     
-    def send_request(self, request_func, url):
+    def send_request(self, request_func, url, **kwargs):
         try:
-            response = request_func(url) 
+            response = request_func(url, kwargs) 
             if response.status_code != 200:
                 return 'Operation Failed'
             else:
@@ -142,13 +143,50 @@ class CommandLineInterface():
 
 
     def do_list(self, params):
-        ''' List ??? '''
-        try:
-            groups = json.loads(requests.get(f'http://{self.target}/net/groups').text)
-            return '\n'.join(groups)
-        except:
-            return f'Failed to connect to target {self.target}'
+        ''' -g List groups (default)
+            -v List voice commands '''
+        if len(params) > 1:
+            raise ValueError('Too many parameters')
 
+        if len(params) == 0 or params[0] == '-g':
+            try:
+                groups = json.loads(requests.get(f'http://{self.target}/net/groups').text)
+                return '\n'.join(groups)
+            except:
+                return f'Failed to connect to target {self.target}'
+
+        elif params[0] == '-v':
+            try:
+                groups = json.loads(requests.get(f'http://{self.target}/voice/phrases').text)
+                return '\n'.join(groups)
+            except:
+                return f'Failed to connect to target {self.target}'
+
+        else:
+            raise ValueError('Wrong option') 
+
+
+    def do_voice(self, params):
+        ''' Manage voice commands
+            -a <command> <endpoint> <payload> Add new voice command
+            -r <command> Remove voice command '''
+        if len(params) == 0:
+            raise ValueError('Option not  given')
+
+        if params[0] == '-a':
+            self.check_param_len(params[1:], 3)
+            data = {'phrase': params[1], 'endpoint': '/tasks/' + params[2], 'payload': params[3]}
+            return requests.put(f'http://{self.target}/voice/phrase', json = data).text
+
+        elif params[0] == '-r':
+            self.check_param_len(params[1:], 1)
+            data = {'phrase': params[1]}
+            return requests.delete(f'http://{self.target}/voice/phrase', json = data).text
+            return self.send_request(requests.delete, f'http://{self.target}/voice/phrase', json = data)
+
+        else:
+            raise ValueError('Wrong option') 
+        
 
     def do_quit(self, params):
         ''' Quit program '''
