@@ -74,7 +74,7 @@ class CommandLineInterface():
     
     def send_request(self, request_func, url, **kwargs):
         try:
-            response = request_func(url, kwargs) 
+            response = request_func(url, **kwargs) 
             if response.status_code != 200:
                 return 'Operation Failed'
             else:
@@ -85,12 +85,12 @@ class CommandLineInterface():
     
     def do_execute(self, params):
         self.check_param_len(params, 1)
-        command = requests.get(f'http://{self.target}/voice/phrase', json={'phrase': params[0]})
-        if command.status_code != 200:
-            return 'No such command'
-        phrase = json.loads(command.text)
-        endpoint = phrase['endpoint']
-        requests.post(f'http://{self.target}{endpoint}') 
+#        command = requests.get(f'http://{self.target}/voice/phrase', json={'phrase': params[0]})
+#        if command.status_code != 200:
+#            return 'No such command'
+#        phrase = json.loads(command.text)
+#        endpoint = phrase['endpoint']
+        requests.post(f'http://{self.target}/voice/p/{params[0]}') 
 
 
     def do_group(self, params):
@@ -185,14 +185,13 @@ class CommandLineInterface():
 
         if params[0] == '-a':
             self.check_param_len(params[1:], 3)
-            data = {'phrase': params[1], 'endpoint': '/tasks/' + params[2], 'payload': params[3]}
-            return requests.put(f'http://{self.target}/voice/phrase', json = data).text
+            data = {'endpoint': '/tasks/' + params[2], 'payload': params[3]}
+            return self.send_request(requests.put, f'http://{self.target}/voice/p/{params[1]}', json=data)
+            return requests.put(f'http://{self.target}/voice/p/{params[1]}', json = data).text
 
         elif params[0] == '-r':
             self.check_param_len(params[1:], 1)
-            data = {'phrase': params[1]}
-            return requests.delete(f'http://{self.target}/voice/phrase', json = data).text
-            return self.send_request(requests.delete, f'http://{self.target}/voice/phrase', json = data)
+            return self.send_request(requests.delete, f'http://{self.target}/voice/p/{params[1]}')
 
         else:
             raise ValueError('Wrong option') 
