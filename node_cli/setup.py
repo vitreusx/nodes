@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name = 'node-cli',
+    name = 'node_cli',
     version = '0',
     author = 'aurora-team',
     description = 'A node CLI for the Aurora IO project.',

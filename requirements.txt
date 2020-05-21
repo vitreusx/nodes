@@ -1,2 +1,2 @@
 -e ./node
--e ./node-cli
+-e ./node_cli
