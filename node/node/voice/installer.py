@@ -12,7 +12,10 @@ class Installer:
     def voice_thread(self):
         rec = sr.Recognizer()
         mic = sr.Microphone()
-        cred = open(self.conf.cred, 'r').read()
+        try:
+            cred = open(self.conf.cred, 'r').read()
+        except:
+            cred = ''
 
         with mic as src:
             rec.adjust_for_ambient_noise(src, duration=1)
@@ -22,7 +25,7 @@ class Installer:
                 command = rec\
                     .recognize_google_cloud(audio, credentials_json=cred)\
                     .strip()
-                print(command)
+                print(f'[Voice] Phrase: {command}')
 
                 phr = self.phrases.phrase(command)
                 requests.post(req.url_root + phr['endpoint'], json=phr['payload'])
@@ -30,12 +33,12 @@ class Installer:
             except:
                 pass
         
-        with self.enabled_cv:
-            while True:
-                self.enabled_cv.wait_for(self.conf.enabled)
-                with mic as src:
-                    audio = rec.listen(src, phrase_time_limit=5)
-                    callback(rec, audio)
+        while True:
+            with self.enabled_cv:
+                self.enabled_cv.wait_for(lambda: self.conf.enabled)
+            with mic as src:
+                audio = rec.listen(src, phrase_time_limit=5)
+                callback(rec, audio)
     
     @staticmethod
     def validate(required):
@@ -50,6 +53,7 @@ class Installer:
         self.phrases = Phrases(self.conf)
         self.enabled_cv = Condition()
         self.thr = Thread(target=self.voice_thread)
+        self.thr.start()
         inst = self
 
         class Voice(Resource):

@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Usage Guide &#8212; Aurora  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="For Contributors" href="for_contributors.html" />
+    <link rel="prev" title="Welcome to Aurora’s documentation!" href="contents.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="usage-guide">
+<span id="id1"></span><h1>Usage Guide<a class="headerlink" href="#usage-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Aurora is a set of interconneted nodes living on multiple machines</div>
+<div class="line">To set it up you will need to copy this folder onto each machine, configure and run it</div>
+</div>
+</div>
+<div class="section" id="installing-required-packages">
+<h2>Installing required packages<a class="headerlink" href="#installing-required-packages" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">To run Aurora you will need the packages listed in the <cite>requirements.txt</cite> file.</div>
+<div class="line">To install the packages (preferably in a virtual environment) type:</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuring-a-local-node">
+<h2>Configuring a local node<a class="headerlink" href="#configuring-a-local-node" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">You must configure the node to give it the addresses of other nodes as well as information on what commands it can run.</div>
+<div class="line">Node config can be found in config.yaml</div>
+<div class="line">The options include:</div>
+</div>
+<ul>
+<li><dl class="simple">
+<dt>nodeName</dt><dd><p>The name that will be used to refer to this node. You have to modify it because having multiple nodes with the same name in the network might cause problems.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>port</dt><dd><p>The port on which the node will be visible to the others in the network. By default it’s 5000. You don’t need to modify it unless you plan to run multiple nodes on the same machine.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>known_nodes</dt><dd><div class="line-block">
+<div class="line">A persistent list of known nodes.</div>
+<div class="line">Entries are of form <cite>{‘name’: ‘nodeA’, ‘ip’: “127.0.0.1”, ‘port’: 5000}</cite>.</div>
+<div class="line">Nodes added here are known on startup.</div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>allowed_scripts</dt><dd><p>A list of commands available to execute on this node.</p>
+</dd>
+</dl>
+</li>
+<li><p>TODO - add more here</p></li>
+</ul>
+</div>
+<div class="section" id="groups">
+<h2>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Nodes can be organized into groups</div>
+<div class="line">When one</div>
+</div>
+</div>
+<div class="section" id="running-the-node">
+<h2>Running the node<a class="headerlink" href="#running-the-node" title="Permalink to this headline">¶</a></h2>
+<p>To run the node run the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">node</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">If everything goes well, you will be moved to a command line to control this node.</div>
+<div class="line">Available commands:</div>
+</div>
+<ul>
+<li><dl>
+<dt>help</dt><dd><div class="line-block">
+<div class="line">Shows the available commands along with their usages.</div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>do &lt;command&gt;</dt><dd><div class="line-block">
+<div class="line">Runs a script from config with matching name as this node.</div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>send &lt;command&gt; &lt;nodeName&gt;</dt><dd><div class="line-block">
+<div class="line">Runs a script on the node with the given name.</div>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>TODO - add more here</p></li>
+</ul>
+</div>
+<div class="section" id="running-the-web-interface">
+<h2>Running the web interface<a class="headerlink" href="#running-the-web-interface" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Node can also be controled from a web interface</div>
+<div class="line">To run the web interface you will need npm installed (version 6.14.5 works)</div>
+</div>
+<ul class="simple">
+<li><p>Enter the <code class="docutils literal notranslate"><span class="pre">/web</span></code> directory</p></li>
+<li><p>On first use run <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">install</span></code></p></li>
+<li><p>To start the web interface run <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">start</span></code></p></li>
+<li><p>Enter shown address in your browser to access the interface</p></li>
+</ul>
+</div>
+<div class="section" id="speech-recognition">
+<h2>Speech recognition<a class="headerlink" href="#speech-recognition" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">You can toggle speech recogintion on/off by setting the option <code class="docutils literal notranslate"><span class="pre">recognize_voice</span></code> in config to <code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">0</span></code> respectively</div>
+<div class="line">When speech recognition is turned on it will listen for commands specified in the config and execute them once heard</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="contents.html">Aurora</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-required-packages">Installing required packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuring-a-local-node">Configuring a local node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#groups">Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-node">Running the node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-web-interface">Running the web interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#speech-recognition">Speech recognition</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="for_contributors.html">For Contributors</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="contents.html">Documentation overview</a><ul>
+      <li>Previous: <a href="contents.html" title="previous chapter">Welcome to Aurora’s documentation!</a></li>
+      <li>Next: <a href="for_contributors.html" title="next chapter">For Contributors</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, ..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/usage_guide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
