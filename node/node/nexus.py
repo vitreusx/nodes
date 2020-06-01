@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
+from flask_httpauth import HTTPBasicAuth
 from dataclasses import dataclass
 import argparse as ap
 import yaml
@@ -11,6 +12,7 @@ class Nexus:
     cors: CORS
     conf: any
     api: Api
+    auth: HTTPBasicAuth
 
     def __init__(self):
         parser = ap.ArgumentParser('node')
@@ -20,6 +22,7 @@ class Nexus:
         self.app = Flask(__name__)
         self.api = Api(self.app)
         self.cors = CORS(self.app)
+        self.auth = HTTPBasicAuth()
         args = parser.parse_args()
         try:
             data = open(args.config, 'r').read()
