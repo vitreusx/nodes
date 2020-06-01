@@ -1,6 +1,7 @@
 from ..nexus import Nexus
 from .config import Config
 from .network import Network
+from .authorization import Authorization
 from flask import request as req, abort, url_for
 from flask_restful import Resource
 import requests
@@ -10,16 +11,11 @@ class Installer:
     def __init__(self, nx: Nexus):
         conf = Config(nx.conf.get('net') or {})
         network = Network(conf)
-
-        USER_DATA = {
-            "local": "localtoken"
-        }
+        authorization = Authorization()
 
         @nx.auth.verify_password
         def verify(username, password):
-            if not (username and password):
-                return False
-            return USER_DATA.get(username) == password
+            return authorization.validate_user(username, password)
 
         class Groups(Resource):
             @nx.auth.login_required
