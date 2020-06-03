@@ -48,7 +48,7 @@ class Installer:
                     for mem in mems:
                         ur = url_for('api.group', group=group, local=True)
                         other_node_name = mem
-                        requests.delete(f'http://{mems[mem]}{ur}',
+                        requests.delete(f'https://{mems[mem]}{ur}',
                                         **nx.auth.get_requests_auth(other_node_name))
 
                 return network.erase(group)
@@ -83,10 +83,10 @@ class Installer:
                             ur = url_for('api.member',\
                                 group=group, member=member,\
                                 addr=req.args['addr'], local=True)
-                            requests.put(f'http://{mems[mem]}{ur}', **nx.auth.get_requests_auth(other_node_name))
+                            requests.put(f'https://{mems[mem]}{ur}', **nx.auth.get_requests_auth(other_node_name))
 
                     other_node_name = mem
-                    requests.post(f'http://{req.args["addr"]}/net/sync/join', json={
+                    requests.post(f'https://{req.args["addr"]}/net/sync/join', json={
                         'group': group,
                         'local': member,
                         'members': network.db[group]['members']
@@ -102,7 +102,7 @@ class Installer:
                         other_node_name = mem
                         ur = url_for('api.member',\
                             group=group, member=member, local=True)
-                        requests.delete(f'http://{mems[mem]}{ur}',
+                        requests.delete(f'https://{mems[mem]}{ur}',
                         **nx.auth.get_requests_auth(other_node_name))
                 if not g.kick(member):
                     return False
@@ -135,6 +135,6 @@ class Installer:
                         targets += [(grp, mem) for mem in trgt[grp]]
             
             for grp, mem in targets:
-                url = f'http://{network.group(grp).member(mem)}{req.json["endpoint"]}'
+                url = f'https://{network.group(grp).member(mem)}{req.json["endpoint"]}'
                 other_node_name = mem
                 requests.post(url, json=req.json['payload'], **nx.auth.get_requests_auth(other_node_name))
