@@ -1,5 +1,7 @@
 import shelve
 import os.path
+import string
+import secrets
 
 """
     Authorization works using users
@@ -18,14 +20,20 @@ class Authorization:
         if(not 'users' in self.db):
             self.db = {'users': {}, 'tokens': {}}
 
+        def generate_random_password():
+            return ''.join(secrets.choice(string.ascii_letters) for i in range(16))
+
+        if(not 'local' in self.db['users']):
+            self.db['users']['local'] = generate_random_password()
+
         if(not node_name in self.db['users']):
-            self.db['users'][node_name] = "12345" # TODO - change to random
+            self.db['users'][node_name] = generate_random_password()
 
     def validate_user(self, username, password):
         if(not username in self.db['users']):
             return False
 
-        return (self.db[username] == password)
+        return (self.db['users'][username] == password)
 
     def add_user(self, username, password):
         self.db['users'][username] = password

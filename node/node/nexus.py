@@ -33,4 +33,5 @@ class Nexus:
             self.conf = {}
 
         self.auth = Authorization(self.conf['net']['name'])
+        print(f'Local password is: {self.auth.get_local_user_pass()}')
 

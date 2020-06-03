@@ -14,7 +14,7 @@ class Installer:
 
         @nx.httpauth.verify_password
         def verify(username, password):
-            return auth.validate_user(username, password)
+            return nx.auth.validate_user(username, password)
 
         class Groups(Resource):
             @nx.httpauth.login_required
