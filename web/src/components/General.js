@@ -23,8 +23,8 @@ const General = () => {
         <InputGroup.Prepend>
           <InputGroup.Text>Login</InputGroup.Text>
         </InputGroup.Prepend>
-        <FormControl placeholder='Login' 
-        value={login} setLogin={e => setLogin(e.target.value)} />
+        <FormControl placeholder='Login'
+        value={login} onChange={e => setLogin(e.target.value)} />
       </InputGroup>
 
       <InputGroup className='mt-2'>
