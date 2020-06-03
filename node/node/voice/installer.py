@@ -28,7 +28,8 @@ class Installer:
                 print(f'[Voice] Phrase: {command}')
 
                 phr = self.phrases.phrase(command)
-                requests.post(req.url_root + phr['endpoint'], json=phr['payload'])
+                other_node_name = nx.conf['net']['name']
+                requests.post(req.url_root + phr['endpoint'], json=phr['payload'], **nx.auth.get_requests_auth(other_node_name))
 
             except:
                 pass
@@ -57,11 +58,11 @@ class Installer:
         inst = self
 
         class Voice(Resource):
-            @nx.auth.login_required
+            @nx.httpauth.login_required
             def get(self):
                 return inst.conf.enabled
             
-            @nx.auth.login_required
+            @nx.httpauth.login_required
             def post(self):
                 inst.conf.enabled = req.json['state']
                 with inst.enabled_cv:
@@ -70,30 +71,31 @@ class Installer:
         nx.api.add_resource(Voice, '/voice')
 
         class PhraseList(Resource):
-            @nx.auth.login_required
+            @nx.httpauth.login_required
             def get(self):
                 return inst.phrases.phrases()
         
         nx.api.add_resource(PhraseList, '/voice/phrases')
 
         class Phrase(Resource):
-            @nx.auth.login_required
+            @nx.httpauth.login_required
             def get(self, phrase):
                 return inst.phrases.phrase(phrase)
             
-            @nx.auth.login_required
+            @nx.httpauth.login_required
             def put(self, phrase):
                 inst.phrases.db[phrase] = {
                     'endpoint': req.json['endpoint'],
                     'payload': req.json['payload']
                 }
 
-            @nx.auth.login_required
+            @nx.httpauth.login_required
             def post(self, phrase):
                 phr = inst.phrases.phrase(phrase)
-                requests.post(req.url_root + phr['endpoint'], json=phr['payload'])
+                other_node_name = nx.conf['net']['name']
+                requests.post(req.url_root + phr['endpoint'], json=phr['payload'], **nx.auth.get_requests_auth(other_node_name))
             
-            @nx.auth.login_required
+            @nx.httpauth.login_required
             def delete(self, phrase):
                 inst.phrases.remove(phrase)
 

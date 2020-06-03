@@ -1,4 +1,5 @@
 import shelve
+import os.path
 
 """
     Authorization works using users
@@ -9,19 +10,19 @@ import shelve
 """
 
 class Authorization:
-    def __init__(self):
+    def __init__(self, node_name):
         # db['users'] is a dict username -> password of trusted users
         # db['tokens'] is a dict nodeName -> accessToken keeping this node's access tokens to other nodes
         self.db = shelve.open('db/auth.db', writeback=True)
 
-        if(not self.db.has_key('users')):
+        if(not 'users' in self.db):
             self.db = {'users': {}, 'tokens': {}}
 
-        if(not self.db['users'].has_key('local')):
-            self.db['users']['local'] = "12345" # TODO - change to random
+        if(not node_name in self.db['users']):
+            self.db['users'][node_name] = "12345" # TODO - change to random
 
     def validate_user(self, username, password):
-        if(not self.db['users'].has_key(username)):
+        if(not username in self.db['users']):
             return False
 
         return (self.db[username] == password)
@@ -50,3 +51,27 @@ class Authorization:
 
     def clear_access_tokens(self):
         self.db['tokens'].clear()
+
+    # Checks if there is authorization data for a given node
+    def has_requests_auth(self, node_name):
+        # Ensure we have a password for this node
+        if(not self.db['tokens'].has_value(node_name)):
+            return False
+
+        # Ensure we have a cert file for this node
+        cert_path = os.path.join('certs', f"{node_name}.pem")
+
+        if(not os.path.isfile(cert_path)):
+            return False
+
+        return True
+
+    # Returns dict containing arguments that need to be passed to requests
+    # use like: requests.get('...', **nx.auth.get_requests_auth('nodeA')))
+    def get_requests_auth(self, node_name):
+        print(f'getting request auth for: {node_name}')
+
+        cert_path = os.path.join('certs', f"{node_name}.pem")
+
+        return {'auth': (node_name, self.db['tokens'].get(node_name)),
+                'verify': str(cert_path)}
