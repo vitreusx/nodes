@@ -8,6 +8,15 @@ from flask_restful import Resource
 import requests
 import json
 
+
+request_method = {
+    'get' : requests.get,
+    'put' : requests.put,
+    'delete' : requests.delete,
+    'post' : requests.post,
+}
+
+
 class Installer:
     def __init__(self, nx: Nexus):
         conf = Config(nx.conf.get('net') or {})
@@ -134,11 +143,16 @@ class Installer:
                 elif isinstance(trgt, dict):
                     for grp in trgt:
                         targets += [(grp, mem) for mem in trgt[grp]]
+
+            try:
+                sender = request_methods[req.json['method']]
+            except:
+                sender = requests.post
             
             for grp, mem in targets:
                 url = f'https://{network.group(grp).member(mem)}{req.json["endpoint"]}'
                 other_node_name = mem
-                requests.post(url, json=req.json['payload'], **nx.auth.get_requests_auth(other_node_name))
+                sender(url, json=req.json['payload'], **nx.auth.get_requests_auth(other_node_name))
 
         # Adds authorized user on this node
         # Request contains json with username and password fields

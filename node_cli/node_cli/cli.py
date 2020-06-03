@@ -1,17 +1,30 @@
 import readline
 import requests
 import json
+import yaml
+import os
 
 
 class CommandLineInterface():
    
     def __init__(self):
-        # TODO something more reasonable
-        self.target = 'localhost:8080'
+        try:
+            data = open('config.yaml', 'r').read()
+            config = yaml.load(data, Loader=yaml.FullLoader)
+            self.name = config['net']['name']
+            self.port = config['port']
+        except:
+            self.name = input('Please enter local node name: ')
+            self.port = input('Please enter port of local node: ')
+
+        self.password = input(f'Please enter password for {self.name}: ')
+        self.target = self.name
+        self.group = self.get_group(self.target)
+
         self.commands = {
             'do' : self.do_execute,
             'group' : self.do_group,
-            'hello' : self.do_hello, 
+            'say-hello' : self.do_hello, 
             'help' : self.do_help, 
             'list' : self.do_list, 
             'voice' : self.do_voice,
@@ -30,7 +43,7 @@ class CommandLineInterface():
 
         
     def prompt(self):
-        return 'aurora > '
+        return f'aurora {self.group}:{self.target}> '
         
 
     def evaluate_command(self, command):
@@ -62,6 +75,23 @@ class CommandLineInterface():
                 print(str(e))
  
 
+    def get_group(self, node):
+        auth = {
+            'auth': ('local', self.password),
+            'verify': str(os.path.join('certs', f'{self.name}.crt'))
+        }
+        
+        groups = requests.get(f'https://127.0.0.1:{self.port}/net/groups', **auth).text
+        groups = json.loads(groups)
+        for group in groups:
+            members = requests.get(f'https://127.0.0.1:{self.port}/net/g/{group}', **auth).text
+            members = json.loads(members)
+            if self.name in members:
+                return group
+
+        raise ValueError("Node doesn't have group") 
+
+
     # functions in self.commands have to have docstring as help
 
 
@@ -71,26 +101,31 @@ class CommandLineInterface():
         if len(params) > length:
             raise ValueError('Too many parameters')
         
-    
-    def send_request(self, request_func, url, **kwargs):
+   
+    def send_request(self, method, endpoint, data={}):
         try:
-            response = request_func(url, **kwargs) 
+            json_dict = dict()
+            json_dict['endpoint'] = endpoint 
+            json_dict['method'] = method
+            json_dict['payload'] = data
+            json_dict['targets'] = {self.group: [self.target]}
+            auth = {
+                'auth': ('local', self.password),
+                'verify': str(os.path.join('certs', f'{self.name}.crt'))
+            }
+            response = requests.post(f'https://127.0.0.1:{self.port}/net/proxy', json=json_dict, **auth) 
             if response.status_code != 200:
                 return 'Operation Failed'
             else:
-                return 'Success'
+                return ('Success', response)
         except:
             return f'Failed to connect to target {self.target}'
             
     
     def do_execute(self, params):
         self.check_param_len(params, 1)
-#        command = requests.get(f'http://{self.target}/voice/phrase', json={'phrase': params[0]})
-#        if command.status_code != 200:
-#            return 'No such command'
-#        phrase = json.loads(command.text)
-#        endpoint = phrase['endpoint']
-        requests.post(f'http://{self.target}/voice/p/{params[0]}') 
+        return self.send_request('post', f'/voice/p/{params[0]}')
+#        requests.post(f'http://{self.target}/voice/p/{params[0]}') 
 
 
     def do_group(self, params):
@@ -107,34 +142,24 @@ class CommandLineInterface():
 
         if params[0] == '-c':
             self.check_param_len(params[1:], 1)
-            # add group named params[1]
-            # TODO check name
-            return self.send_request(requests.put, f'http://{self.target}/net/g/{params[1]}')
+            return self.send_request('put', f'/net/g/{params[1]}')[0]
             
         elif params[0] == '-d':
             self.check_param_len(params[1:], 1)
-            # add group named params[1]
-            # TODO check name
-            return self.send_request(requests.delete, f'http://{self.target}/net/g/{params[1]}')
+            return self.send_request('delete', f'/net/g/{params[1]}')[0]
         
         elif params[0] == '-a':
             self.check_param_len(params[1:], 2)
-            return self.send_request(requests.put, f'http://{self.target}/net/g/{params[1]}/m/{params[2]}') 
+            return self.send_request('put', f'/net/g/{params[1]}/m/{params[2]}')[0]
             
         elif params[0] == '-r':
             self.check_param_len(params[1:], 2)
-            return self.send_request(requests.delete, f'http://{self.target}/net/g/{params[1]}/m/{params[2]}') 
+            return self.send_request('delete', f'/net/g/{params[1]}/m/{params[2]}')[0]
         elif params[0] == '-m':
             self.check_param_len(params[1:], 1)
-            try:
-                response = requests.get(f'http://{self.target}/net/g/{params[1]}') 
-                if response.status_code != 200:
-                    return 'Operation Failed'
-                else:
-                    members = [key + ' - ' + value for key, value in json.loads(response.text).items()]
-                    return '\n'.join(members)
-            except:
-                return f'Failed to connect to target {self.target}'
+            response = self.send_request('get', f'/net/g/{params[1]}')[1]
+            members = [key + ' - ' + value for key, value in json.loads(response.text).items()]
+            return '\n'.join(members)
 
         else:
             raise ValueError('Wrong option')
@@ -159,18 +184,14 @@ class CommandLineInterface():
             raise ValueError('Too many parameters')
 
         if len(params) == 0 or params[0] == '-g':
-            try:
-                groups = json.loads(requests.get(f'http://{self.target}/net/groups').text)
-                return '\n'.join(groups)
-            except:
-                return f'Failed to connect to target {self.target}'
+            response = self.send_request('get', f'/net/groups')[1]
+            groups = json.loads(response.text)
+            return '\n'.join(groups)
 
         elif params[0] == '-v':
-            try:
-                groups = json.loads(requests.get(f'http://{self.target}/voice/phrases').text)
-                return '\n'.join(groups)
-            except:
-                return f'Failed to connect to target {self.target}'
+            response = self.send_request('get','/voice/phrases')
+            groups = json.loads(response.text)
+            return '\n'.join(groups)
 
         else:
             raise ValueError('Wrong option') 
@@ -181,17 +202,16 @@ class CommandLineInterface():
             -a <command> <endpoint> <payload> Add new voice command
             -r <command> Remove voice command '''
         if len(params) == 0:
-            raise ValueError('Option not  given')
+            raise ValueError('Option not given')
 
         if params[0] == '-a':
             self.check_param_len(params[1:], 3)
             data = {'endpoint': '/tasks/' + params[2], 'payload': params[3]}
-            return self.send_request(requests.put, f'http://{self.target}/voice/p/{params[1]}', json=data)
-            return requests.put(f'http://{self.target}/voice/p/{params[1]}', json = data).text
+            return self.send_request('put', f'/voice/p/{params[1]}', data)[0]
 
         elif params[0] == '-r':
             self.check_param_len(params[1:], 1)
-            return self.send_request(requests.delete, f'http://{self.target}/voice/p/{params[1]}')
+            return self.send_request('delete', f'/voice/p/{params[1]}')
 
         else:
             raise ValueError('Wrong option') 
