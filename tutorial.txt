@@ -31,3 +31,24 @@ curl https://127.0.0.1:8080/net/groups --cacert certs/nodeA.crt --user local:<lo
 
 You can post json like this:
 curl -H "Content-Type: application/json" --insecure --user local:SKkxiqEcIipZeLLY https://127.0.0.1:8080/net/adduser --data '{"username": "admin", "password": "admin"}'
+
+Let's connect nodes nodeA and nodeB #TODO - implement protocol
+let's say that A's access token to B is "AtoB" and B's access token to A is "BtoA"
+
+First copy nodeA.crt to nodeB/certs and nodeB.crt to nodeA/certs
+
+We need to add these users and tokens to nodes
+
+Add user 'nodeB' with password 'BtoA' to nodeA
+curl -H "Content-Type: application/json" --insecure --user local:KrhIqsHrphPhugnX https://127.0.0.1:8080/net/adduser --data '{"username": "nodeB", "password": "BtoA"}'
+
+Add token for accessing nodeA to nodeB
+curl -H "Content-Type: application/json" --insecure --user local:eRLyOVjbKpmimZDR https://127.0.0.1:8081/net/addtoken --data '{"name": "nodeA", "token": "BtoA"}'
+
+Add user 'nodeA' with password 'AtoB' to nodeB
+curl -H "Content-Type: application/json" --insecure --user local:eRLyOVjbKpmimZDR https://127.0.0.1:8081/net/adduser --data '{"username": "nodeA", "password": "AtoB"}'
+
+Add token for accessing nodeB to nodeA
+curl -H "Content-Type: application/json" --insecure --user local:KrhIqsHrphPhugnX https://127.0.0.1:8080/net/addtoken --data '{"name": "nodeA", "token": "AtoB"}'
+
+Now A and B can communicate
