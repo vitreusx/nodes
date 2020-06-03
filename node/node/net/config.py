@@ -17,6 +17,7 @@ class Config:
     store: str = 'db/net.db'
     name: str = '<Node>'
     addr: str = 'localhost:8080'
+    port: str = '8080'
 
     def __init__(self, conf):
         self.__dict__.update(conf or {})

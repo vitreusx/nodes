@@ -10,7 +10,6 @@ from os.path import dirname
     There is a set of authorized users that are allowed to use this node
     Other nodes present their name and accessToken as username and password
     There is an user named 'local' with random password that local interfaces use to authorize
-
 """
 
 class Authorization:
@@ -28,11 +27,17 @@ class Authorization:
             self.db['users'] = {}
             self.db['tokens'] = {}
 
+        # Add password for local user
         if(not 'local' in self.db['users']):
             self.db['users']['local'] = Authorization.generate_random_password()
 
+        # Add password to myself
         if(not node_name in self.db['users']):
             self.db['users'][node_name] = Authorization.generate_random_password()
+            self.db['tokens'][node_name] = self.db['users'][node_name]
+
+        print(self.db['users'])
+        print(self.db['tokens'])
 
         self.db.sync()
 
@@ -83,7 +88,7 @@ class Authorization:
             return False
 
         # Ensure we have a cert file for this node
-        cert_path = os.path.join('certs', f"{node_name}.pem")
+        cert_path = os.path.join('certs', f"{node_name}.crt")
 
         if(not os.path.isfile(cert_path)):
             return False
@@ -95,7 +100,7 @@ class Authorization:
     def get_requests_auth(self, node_name):
         print(f'getting request auth for: {node_name}')
 
-        cert_path = os.path.join('certs', f"{node_name}.pem")
+        cert_path = os.path.join('certs', f"{node_name}.crt")
 
         return {'auth': (self.my_name, self.db['tokens'].get(node_name)),
                 'verify': str(cert_path)}

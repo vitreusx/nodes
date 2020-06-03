@@ -2,6 +2,7 @@ from ..nexus import Nexus
 from .config import Config
 from .network import Network
 from .authorization import Authorization
+from .connecting import ConnectionHandshake
 from flask import request as req, abort, url_for
 from flask_restful import Resource
 import requests
@@ -163,3 +164,158 @@ class Installer:
 
             nx.auth.add_access_token(other_node_name, token)
             return ''
+
+        # dict connection_request_id -> ConnectionHandshake
+        connection_requests = {}
+
+        # This request instructs node to start connecting to other node
+        # Arguments (json): name, address
+        # After connection happens it needs to be approved by user
+        # This will be an entry in /connect/pending
+        @nx.app.route('/connect/start', methods=['POST'])
+        @nx.httpauth.login_required
+        def start_connecting():
+            my_name = conf.name
+            my_certificate = str(open(f"certs/{conf.name}.crt").read())
+            other_node_name = req.json['name']
+            other_node_address = req.json['address']
+
+            conn_request_id = Authorization.generate_random_password()
+            connection_requests[conn_request_id] = ConnectionHandshake(my_name)
+            cur_handshake = connection_requests[conn_request_id]
+            cur_handshake.other_node_address = other_node_address
+            cur_handshake.other_name = other_node_name
+
+            requests.post(f"https://{other_node_address}/connect/request",
+                        json={
+                            'id': conn_request_id,
+                            'name': my_name,
+                            'cert': my_certificate,
+                            'port': nx.conf['port']
+                        }, verify=False)
+
+            return ''
+
+        # Connection request (in json)
+        # cert: .crt file as string
+        # name: name of node requesting connection
+        # id: identification string of this request
+        # port: other node port
+        @nx.app.route('/connect/request', methods=['POST'])
+        def connection_request():
+            # TODO - check that conn_request_id is just letters a-z or we got an exploit xd
+            conn_request_id = str(req.json['id'])
+            other_node_name = str(req.json['name'])
+            other_node_port = str(req.json['port'])
+            other_node_certificate = str(req.json['cert'])
+            my_name = conf.name
+
+            connection_requests[conn_request_id] = ConnectionHandshake(my_name)
+            cur_handshake = connection_requests[conn_request_id]
+            cur_handshake.other_certificate = other_node_certificate
+            cur_handshake.other_name = other_node_name
+            cur_handshake.other_node_address = f"{req.remote_addr}:{other_node_port}"
+
+            other_cert_file_path = f"certs/tmp_{conn_request_id}.crt"
+            cert_file = open(other_cert_file_path, "w")
+            cert_file.write(other_node_certificate)
+            cert_file.close()
+
+            requests.post(f"https://{cur_handshake.other_node_address}/connect/response",
+                          json={
+                              'cert': cur_handshake.my_certificate,
+                              'token': cur_handshake.access_token_to_me,
+                              'id': conn_request_id
+                          }, verify=other_cert_file_path)
+
+            return ''
+
+        # Connection request response (json)
+        # cert: other node's certificate
+        # token: acces token for other node
+        # id: identification string of this request
+        @nx.app.route('/connect/response', methods=['POST'])
+        def connection_request_response():
+            # TODO - check that conn_request_id is just letters a-z or we got an exploit xd
+            other_certificate = str(req.json['cert'])
+            token_for_other = str(req.json['token'])
+            conn_request_id = str(req.json['id'])
+
+            cur_handshake = connection_requests[conn_request_id]
+
+            cur_handshake.other_certificate = other_certificate
+            cur_handshake.access_token_to_other = token_for_other
+
+            other_cert_file_path = f"certs/tmp_{conn_request_id}.crt"
+            cert_file = open(other_cert_file_path, "w")
+            cert_file.write(other_certificate)
+            cert_file.close()
+
+            requests.post(f"https://{cur_handshake.other_node_address}/connect/finish",
+                          json={
+                              'id': conn_request_id,
+                              'token': cur_handshake.access_token_to_me
+                          }, verify = other_cert_file_path)
+
+            return ''
+
+        # Finish connection request
+        # token: access token to other node
+        # id: identification string of this request
+        @nx.app.route('/connect/finish', methods=['POST'])
+        def connection_finish():
+            # TODO - check that conn_request_id is just letters a-z or we got an exploit xd
+            conn_request_id = str(req.json['id'])
+            access_token_to_other = str(req.json['token'])
+
+            cur_handshake = connection_requests[conn_request_id]
+            cur_handshake.access_token_to_other = access_token_to_other
+
+            return ''
+
+        # Gets list of pending connections
+        # Each connection is a dict {'nodeName': str, 'hash': str}
+        # User should confirm that hashes are the same on nodes willing to connect
+        # And then do /connect/accept
+        @nx.app.route('/connect/pending', methods=['GET'])
+        @nx.httpauth.login_required
+        def get_pending_connections():
+            pending_connections = []
+
+            for handshake in connection_requests.values():
+                if(handshake.is_complete()):
+                    pending_connections.append({
+                        'nodeName': handshake.other_name,
+                        'hash': handshake.get_hash()
+                    })
+
+            return {'conns': pending_connections}
+
+        # This is used to accept a pending connection request
+        # hash: hash of pending connection that should be accepted
+        @nx.app.route('/connect/accept', methods=['POST'])
+        @nx.httpauth.login_required
+        def accept_connection():
+            accepted_hash = req.json['hash']
+
+            for handshake_id in connection_requests.keys():
+                handshake = connection_requests[handshake_id]
+
+                if(not handshake.is_complete() or handshake.get_hash() != accepted_hash):
+                    continue
+
+                new_node_name = handshake.other_name
+                new_node_address = handshake.other_node_address
+
+                nx.auth.add_user(new_node_name, handshake.access_token_to_me)
+                nx.auth.add_access_token(new_node_name, handshake.access_token_to_other)
+
+                new_node_cert_file = open(f"certs/{new_node_name}.crt", "w")
+                new_node_cert_file.write(handshake.other_certificate)
+                new_node_cert_file.close()
+
+                del connection_requests[handshake_id]
+
+                return ''
+
+            return 404

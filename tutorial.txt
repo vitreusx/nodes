@@ -32,6 +32,31 @@ curl https://127.0.0.1:8080/net/groups --cacert certs/nodeA.crt --user local:<lo
 You can post json like this:
 curl -H "Content-Type: application/json" --insecure --user local:SKkxiqEcIipZeLLY https://127.0.0.1:8080/net/adduser --data '{"username": "admin", "password": "admin"}'
 
+
+How to create trusted connection between two nodes:
+
+First tell nodeA to connect to nodeB
+
+curl -H "Content-Type: application/json" --insecure https://127.0.0.1:8080/connect/start --data '{"name": "nodeB", "address": "127.0.0.1:8081"}' --user local:<local a pass>
+
+Now nodes have exchanged information and user needs to verify and accept hashes
+
+We can see pending connections with
+curl https://127.0.0.1:8080/connect/pending --user local:<a local pass> --insecure
+{"conns":[{"hash":"28e2047afe5db1d80a36a6304b69302c7811864a72e5a41a5e2271078514e7ec","nodeName":"nodeB"}]}
+
+curl https://127.0.0.1:8081/connect/pending --user local:<b local pass> --insecure
+{"conns":[{"hash":"28e2047afe5db1d80a36a6304b69302c7811864a72e5a41a5e2271078514e7ec","nodeName":"nodeA"}]}
+
+Hashes match so let's connect them together
+curl -H "Content-Type: application/json" --insecure https://127.0.0.1:8080/connect/accept --data '{"hash": "28e2047afe5db1d80a36a6304b69302c7811864a72e5a41a5e2271078514e7ec"}' --user local:<a pass>
+curl -H "Content-Type: application/json" --insecure https://127.0.0.1:8081/connect/accept --data '{"hash": "28e2047afe5db1d80a36a6304b69302c7811864a72e5a41a5e2271078514e7ec"}' --user local:<b pass>
+
+Now these nodes have been securely connected and can start exchanging information
+Now Authorization.get_requests_auth() will have proper information about other node
+
+OLD STUFF - manually connecting two nodes:
+
 Let's connect nodes nodeA and nodeB #TODO - implement protocol
 let's say that A's access token to B is "AtoB" and B's access token to A is "BtoA"
 
