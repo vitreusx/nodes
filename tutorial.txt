@@ -1,0 +1,29 @@
+In this tutorial we gonna
+
+> Create 3 nodes nodeA, nodeB, nodeC
+> Connect them into a group
+> Add voice command 'light' on nodeA which when heard will be sent to nodeA and nodeB which are gonna run light script
+> Run command light from local cli interface on nodeA
+> Run local light command from CLI interface on nodeB, nodeC
+> Do the same from web interface??
+
+Clone repo
+create & activate virtualenv
+pip install -r requirements.txt
+
+create directories nodeA, nodeB, nodeC
+copy config.yaml and certs directory into each of them
+in each config change port to a different number (ex 8080 8081 8082)
+in each config change name to this node's name
+in each certs directory run this command with this node's name
+./generate_cert.sh nodeA
+Just press enter on all questions
+
+In each folder run python3 -m node
+
+Rach node should start and you should see the line
+Local password is: <local pass>
+
+Now you can make curl requests to nodes with curl ex
+curl https://127.0.0.1:8080/net/groups --user local:<local pass> --insecure
+

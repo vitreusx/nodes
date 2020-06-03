@@ -2,6 +2,8 @@ import shelve
 import os.path
 import string
 import secrets
+from os import makedirs
+from os.path import dirname
 
 """
     Authorization works using users
@@ -15,6 +17,7 @@ class Authorization:
     def __init__(self, node_name):
         # db['users'] is a dict username -> password of trusted users
         # db['tokens'] is a dict nodeName -> accessToken keeping this node's access tokens to other nodes
+        makedirs(dirname('db/auth.db'), exist_ok=True)
         self.db = shelve.open('db/auth.db', writeback=True)
 
         if(not 'users' in self.db):
