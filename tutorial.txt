@@ -17,7 +17,6 @@ in each config change port to a different number (ex 8080 8081 8082)
 in each config change name to this node's name
 in each certs directory run this command with this node's name and ip address
 ./generate_cert.sh nodeA 127.0.0.1
-Just press enter on all questions
 
 In each folder run python3 -m node
 
@@ -29,3 +28,6 @@ curl https://127.0.0.1:8080/net/groups --user local:<local pass> --insecure
 
 Or with certificate validation
 curl https://127.0.0.1:8080/net/groups --cacert certs/nodeA.crt --user local:<local pass>
+
+You can post json like this:
+curl -H "Content-Type: application/json" --insecure --user local:SKkxiqEcIipZeLLY https://127.0.0.1:8080/net/adduser --data '{"username": "admin", "password": "admin"}'

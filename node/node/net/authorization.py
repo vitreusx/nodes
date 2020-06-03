@@ -14,6 +14,8 @@ from os.path import dirname
 """
 
 class Authorization:
+    db: shelve.Shelf
+
     def __init__(self, node_name):
         # db['users'] is a dict username -> password of trusted users
         # db['tokens'] is a dict nodeName -> accessToken keeping this node's access tokens to other nodes
@@ -21,16 +23,19 @@ class Authorization:
         self.db = shelve.open('db/auth.db', writeback=True)
 
         if(self.db.get('users') is None):
-            self.db = {'users': {}, 'tokens': {}}
+            self.db['users'] = {}
+            self.db['tokens'] = {}
 
-        def generate_random_password():
-            return ''.join(secrets.choice(string.ascii_letters) for i in range(16))
-
-        if(self.db['users'].get('local') is None):
-            self.db['users']['local'] = generate_random_password()
+        if(not 'local' in self.db['users']):
+            self.db['users']['local'] = Authorization.generate_random_password()
 
         if(not node_name in self.db['users']):
-            self.db['users'][node_name] = generate_random_password()
+            self.db['users'][node_name] = Authorization.generate_random_password()
+
+        self.db.sync()
+
+    def generate_random_password():
+            return ''.join(secrets.choice(string.ascii_letters) for i in range(16))
 
     def validate_user(self, username, password):
         if(not username in self.db['users']):

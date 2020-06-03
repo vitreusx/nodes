@@ -138,3 +138,28 @@ class Installer:
                 url = f'https://{network.group(grp).member(mem)}{req.json["endpoint"]}'
                 other_node_name = mem
                 requests.post(url, json=req.json['payload'], **nx.auth.get_requests_auth(other_node_name))
+
+        # Adds authorized user on this node
+        # Request contains json with username and password fields
+        @nx.app.route('/net/adduser', methods=['POST'])
+        @nx.httpauth.login_required
+        def add_user():
+            username = str(req.json['username'])
+            password = str(req.json['password'])
+
+            nx.auth.add_user(username, password)
+            return ''
+
+        # Someone gives us access token to them
+        # Request contains 
+        # name - name of node for which this token is for
+        # token - access token
+        # This means that we have been added as user on this node
+        @nx.app.route('/net/addtoken', methods=['POST'])
+        @nx.httpauth.login_required
+        def add_access_token():
+            other_node_name = str(req.json['name'])
+            token = str(req.json['name'])
+
+            nx.auth.add_access_token(other_node_name, token)
+            return ''
