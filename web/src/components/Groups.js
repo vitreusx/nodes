@@ -22,7 +22,10 @@ const GroupContextMenu = (props) => {
   const leave = async () => {
     try {
       await fetch(`http://${ctx.addr[0]}/net/g/${group}/leave`, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+        }
       });
     }
     catch (e) {
@@ -35,7 +38,10 @@ const GroupContextMenu = (props) => {
   const destroy = async () => {
     try {
       await fetch(`http://${ctx.addr[0]}/net/g/${group}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+        }
       });
     }
     catch (e) {
@@ -70,7 +76,10 @@ const AllGroupsContextMenu = (props) => {
     setShowCreate(false);
     try {
       await fetch(`http://${ctx.addr[0]}/net/g/${name}`, {
-        method: 'PUT'
+        method: 'PUT', 
+        headers: {
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+        }
       });
     }
     catch (e) {
@@ -119,7 +128,11 @@ const Groups = () => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/net/groups`);
+          const res = await fetch(`http://${ctx.addr[0]}/net/groups`, {
+            headers: {
+              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+            }
+          });
           const data = await res.json();
           setGroups(data);
         }
@@ -130,7 +143,7 @@ const Groups = () => {
     }
 
     retrieveGroups();
-  }, [ctx.addr, ctx.refresh]);
+  }, [ctx.addr, ctx.refresh, ctx.login, ctx.password]);
 
   const id1 = Math.random().toString();
   const id2 = Math.random().toString();
@@ -138,9 +151,9 @@ const Groups = () => {
 
   return (
     <Tab.Container>
-      <Row>
-        <Col sm={2}></Col>
-        <Col sm={4}>
+      <Row className='justify-content-around'>
+        <Col sm={1}></Col>
+        <Col sm={4} className='border'>
           <ContextMenuTrigger id={id1}>
             <Nav variant='pills' className='flex-column vh-100'>
               {groups.map(group => (
@@ -158,7 +171,7 @@ const Groups = () => {
           </ContextMenuTrigger>
           <AllGroupsContextMenu data={{id: id1}}/>
         </Col>
-        <Col sm={4}>
+        <Col sm={4} className='border'>
           <Tab.Content>
             {groups.map(group => (
               <Tab.Pane eventKey={group}>
@@ -167,7 +180,7 @@ const Groups = () => {
             ))}
           </Tab.Content>
         </Col>
-        <Col sm={2}></Col>
+        <Col sm={1}></Col>
       </Row>
     </Tab.Container>
   )

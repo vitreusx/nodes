@@ -22,7 +22,12 @@ const PhraseContextMenu = (props) => {
 
   const remove = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/voice/p/${phrase}`, { method: 'DELETE' });
+      await fetch(`http://${ctx.addr[0]}/voice/p/${phrase}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+        }
+      });
       ctx.voiceRefr[1](ctx.voiceRefr[0] + 1);
     }
     catch (e) {}
@@ -49,7 +54,8 @@ const PhrasesPanContextMenu = (props) => {
       await fetch(`http://${ctx.addr[0]}/voice/p/${phrase}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
         },
         body: JSON.stringify({
           'endpoint': '',
@@ -102,7 +108,11 @@ const Phrases = () => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/voice/phrases`);
+          const res = await fetch(`http://${ctx.addr[0]}/voice/phrases`, {
+            headers: {
+              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+            }
+          });
           const data = await res.json();
           setPhrases(data);
         }
@@ -113,7 +123,7 @@ const Phrases = () => {
     };
 
     retrievePhrases();
-  }, [ctx.addr, ctx.voiceRefr]);
+  }, [ctx.addr, ctx.voiceRefr, ctx.login, ctx.password]);
 
   const id1 = Math.random().toString();
   const id2 = Math.random().toString();
@@ -147,7 +157,8 @@ const Phrases = () => {
         await fetch(`http://${ctx.addr[0]}/voice/p/${phrase}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
           },
           body: JSON.stringify({
             'endpoint': endpoint,
@@ -162,7 +173,7 @@ const Phrases = () => {
 
   return (
     <Row>
-      <Col sm={3}>
+      <Col sm={3} className='border'>
         <ContextMenuTrigger id={id1}>
           <Nav variant='pills' className='flex-column vh-100'>
             {phrases.map(phrase => (
@@ -213,7 +224,11 @@ const Voice = () => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/voice`);
+          const res = await fetch(`http://${ctx.addr[0]}/voice`, {
+            headers: {
+              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+            }
+          });
           const data = await res.text();
           setEnabled(data === 'True');
         }
@@ -224,14 +239,15 @@ const Voice = () => {
     }
 
     retrieveEnabled();
-  }, [ctx.addr]);
+  }, [ctx.addr, ctx.login, ctx.password]);
 
   const toggleVoice = async () => {
     try {
       await fetch(`http://${ctx.addr[0]}/voice`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
         },
         body: JSON.stringify({
           'state': !enabled

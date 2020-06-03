@@ -56,7 +56,10 @@ const AllMembersContextMenu = (props) => {
     setShowAdd(false);
     try {
       await fetch(`http://${ctx.addr[0]}/net/g/${props.group}/m/${name}?addr=${addr}`, {
-        method: 'PUT'
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+        }
       });
     }
     catch (e) {
@@ -112,7 +115,11 @@ const Members = (props) => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/net/g/${props.group}`);
+          const res = await fetch(`http://${ctx.addr[0]}/net/g/${props.group}`, {
+            headers: {
+              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+            }
+          });
           const data = await res.json();
           setMembers(Object.entries(data));
         }
@@ -123,7 +130,7 @@ const Members = (props) => {
     }
 
     retrieveMembers();
-  }, [ctx.addr, ctx.refresh, props.group]);
+  }, [ctx.addr, ctx.refresh, props.group, ctx.login, ctx.password]);
 
   const id1 = Math.random().toString();
   const ConnMemberContextMenu = connectMenu(id1)(MemberContextMenu);
