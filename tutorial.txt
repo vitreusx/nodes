@@ -15,8 +15,8 @@ create directories nodeA, nodeB, nodeC
 copy config.yaml and certs directory into each of them
 in each config change port to a different number (ex 8080 8081 8082)
 in each config change name to this node's name
-in each certs directory run this command with this node's name
-./generate_cert.sh nodeA
+in each certs directory run this command with this node's name and ip address
+./generate_cert.sh nodeA 127.0.0.1
 Just press enter on all questions
 
 In each folder run python3 -m node
@@ -27,3 +27,5 @@ Local password is: <local pass>
 Now you can make curl requests to nodes with curl ex
 curl https://127.0.0.1:8080/net/groups --user local:<local pass> --insecure
 
+Or with certificate validation
+curl https://127.0.0.1:8080/net/groups --cacert certs/nodeA.crt --user local:<local pass>

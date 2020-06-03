@@ -20,13 +20,13 @@ class Authorization:
         makedirs(dirname('db/auth.db'), exist_ok=True)
         self.db = shelve.open('db/auth.db', writeback=True)
 
-        if(not 'users' in self.db):
+        if(self.db.get('users') is None):
             self.db = {'users': {}, 'tokens': {}}
 
         def generate_random_password():
             return ''.join(secrets.choice(string.ascii_letters) for i in range(16))
 
-        if(not 'local' in self.db['users']):
+        if(self.db['users'].get('local') is None):
             self.db['users']['local'] = generate_random_password()
 
         if(not node_name in self.db['users']):
