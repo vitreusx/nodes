@@ -31,7 +31,7 @@ const General = () => {
         <InputGroup.Prepend>
           <InputGroup.Text>Password</InputGroup.Text>
         </InputGroup.Prepend>
-        <FormControl placeholder='Password' 
+        <FormControl placeholder='Password' type='password'
         value={pass} onChange={e => setPass(e.target.value)} />
       </InputGroup>
     </div>
