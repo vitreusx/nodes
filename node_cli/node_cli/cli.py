@@ -5,6 +5,14 @@ import yaml
 import os
 
 
+request_methods = {
+    'get' : requests.get,
+    'put' : requests.put,
+    'delete' : requests.delete,
+    'post' : requests.post,
+}
+
+
 class CommandLineInterface():
    
     def __init__(self):
@@ -92,7 +100,7 @@ class CommandLineInterface():
             if node in members:
                 return group
 
-        raise ValueError("Node doesn't have group") 
+        return None
 
 
     # functions in self.commands have to have docstring as help
@@ -107,17 +115,30 @@ class CommandLineInterface():
    
     def send_request(self, method, endpoint, data={}):
         try:
-            json_dict = dict()
-            json_dict['endpoint'] = endpoint 
-            json_dict['method'] = method
-            json_dict['payload'] = data
-            json_dict['targets'] = {self.group: [self.target]}
             auth = {
                 'auth': ('local', self.password),
                 'verify': str(os.path.join('certs', f'{self.name}.crt'))
             }
-            response = requests.post(f'https://127.0.0.1:{self.port}/net/proxy', json=json_dict, **auth) 
-            response_text = json.loads(response.text)[0]
+
+            sender = request_methods[method]
+
+            response_text = ''
+            
+            if self.target == self.name:
+                response = sender(f'https://127.0.0.1:{self.port}/{endpoint}', json=data, **auth)
+                response_text = response.text
+            else:
+                if self.target == None:
+                    raise ValueError("Node does not have a group")
+
+                json_dict = dict()
+                json_dict['endpoint'] = endpoint 
+                json_dict['method'] = method
+                json_dict['payload'] = data
+                json_dict['targets'] = {self.group: [self.target]}
+                response = requests.post(f'https://127.0.0.1:{self.port}/net/proxy', json=json_dict, **auth) 
+                response_text = json.loads(response.text)[0]
+
             if response.status_code != 200:
                 return 'Operation Failed'
             else:
