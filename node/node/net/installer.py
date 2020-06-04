@@ -205,7 +205,7 @@ class Installer:
                             'id': conn_request_id,
                             'name': my_name,
                             'cert': my_certificate,
-                            'port': nx.conf['port']
+                            'port': conf.port
                         }, verify=False)
 
             return ''
@@ -304,6 +304,11 @@ class Installer:
                     })
 
             return {'conns': pending_connections}
+        
+        @nx.app.route('/connect/accepted', methods=['GET'])
+        @nx.httpauth.login_required
+        def get_accepted_connections():
+            return json.dumps(list(nx.auth.get_user_list()))
 
         # This is used to accept a pending connection request
         # hash: hash of pending connection that should be accepted

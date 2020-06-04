@@ -8,13 +8,15 @@ export const AppProvider = ({ children }) => {
   const [voiceRefr, setVoiceRefr] = useState(0);
   const [login, setLogin] = useState('');
   const [pass, setPass] = useState('');
+  const [authRefr, setAuthRefr] = useState(0);
 
   const state = {
     addr: [addr, setAddr],
     refresh: [refresh, setRefresh],
     voiceRefr: [voiceRefr, setVoiceRefr],
     login: [login, setLogin],
-    pass: [pass, setPass]
+    pass: [pass, setPass],
+    authRefr: [authRefr, setAuthRefr]
   }
 
   return (
