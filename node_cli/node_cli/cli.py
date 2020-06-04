@@ -12,7 +12,7 @@ class CommandLineInterface():
             data = open('config.yaml', 'r').read()
             config = yaml.load(data, Loader=yaml.FullLoader)
             self.name = config['net']['name']
-            self.port = config['port']
+            self.port = config['net']['port']
         except:
             self.name = input('Please enter local node name: ')
             self.port = input('Please enter port of local node: ')
@@ -20,6 +20,7 @@ class CommandLineInterface():
         self.password = input(f'Please enter password for {self.name}: ')
         self.target = self.name
         self.group = self.get_group(self.target)
+        self.cert = str(os.path.join('certs', f'{self.name}.crt'))
 
         self.commands = {
             'do' : self.do_execute,
@@ -28,7 +29,8 @@ class CommandLineInterface():
             'help' : self.do_help, 
             'list' : self.do_list, 
             'voice' : self.do_voice,
-            'quit' : self.do_quit, 
+            'conn':   self.do_conn,
+            'quit': self.do_quit
         }
         
         def complter(text, state):
@@ -216,7 +218,40 @@ class CommandLineInterface():
         else:
             raise ValueError('Wrong option') 
         
+    def do_conn(self, params):
+        ''' Manage secure connections from/to this node
+            -c <nodeName> <nodeAdress> Initiate connection to this node
+            -p See pending connections with their hashes
+            -a <hash> Accept connection with given hash '''
 
+        if len(params) == 0:
+            raise ValueError('Option not given')
+
+        if params[0] == '-c':
+            self.check_param_len(params[1:], 2)
+            nodeName = params[1]
+            nodeAddr = params[2]
+
+            resp = requests.post(f"https://127.0.0.1:{self.port}/connect/start", json={
+                'name': nodeName,
+                'address': nodeAddr
+            }, 
+            auth = ('local', self.password),
+            verify=self.cert)
+
+        if params[0] == '-p':
+            resp = requests.get(f"https://127.0.0.1:{self.port}/connect/pending", auth = ('local', self.password), verify=self.cert)
+            print(resp.text)
+
+        if params[0] == '-a':
+            self.check_param_len(params[1:], 1)
+            accepted_hash = params[1]
+            requests.post(f"https://127.0.0.1:{self.port}/connect/accept", 
+                          json={
+                              'hash': accepted_hash
+                          },
+                          auth = ('local', self.password), verify=self.cert)
+            
     def do_quit(self, params):
         ''' Quit program '''
         quit()

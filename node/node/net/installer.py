@@ -205,7 +205,7 @@ class Installer:
                             'id': conn_request_id,
                             'name': my_name,
                             'cert': my_certificate,
-                            'port': nx.conf['port']
+                            'port': nx.conf['net']['port']
                         }, verify=False)
 
             return ''
