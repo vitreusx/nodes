@@ -21,9 +21,12 @@ const MemberContextMenu = (props) => {
 
   const kick = async () => {
     try {
-      console.log(`http://${ctx.addr[0]}/net/g/${group}/m/${member}`);
-      await fetch(`http://${ctx.addr[0]}/net/g/${group}/m/${member}`, {
-        method: 'DELETE'
+      console.log(`https://${ctx.addr[0]}/net/g/${group}/m/${member}`);
+      await fetch(`https://${ctx.addr[0]}/net/g/${group}/m/${member}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
+        }
       });
     }
     catch (e) {
@@ -55,10 +58,10 @@ const AllMembersContextMenu = (props) => {
   const add = async e => {
     setShowAdd(false);
     try {
-      await fetch(`http://${ctx.addr[0]}/net/g/${props.group}/m/${name}?addr=${addr}`, {
+      await fetch(`https://${ctx.addr[0]}/net/g/${props.group}/m/${name}?addr=${addr}`, {
         method: 'PUT',
         headers: {
-          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
         }
       });
     }
@@ -115,9 +118,9 @@ const Members = (props) => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/net/g/${props.group}`, {
+          const res = await fetch(`https://${ctx.addr[0]}/net/g/${props.group}`, {
             headers: {
-              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
             }
           });
           const data = await res.json();
@@ -130,7 +133,7 @@ const Members = (props) => {
     }
 
     retrieveMembers();
-  }, [ctx.addr, ctx.refresh, props.group, ctx.login, ctx.password]);
+  }, [ctx.addr, ctx.refresh, props.group, ctx.login, ctx.pass]);
 
   const id1 = Math.random().toString();
   const ConnMemberContextMenu = connectMenu(id1)(MemberContextMenu);

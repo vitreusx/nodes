@@ -25,7 +25,7 @@ const PhraseContextMenu = (props) => {
       await fetch(`http://${ctx.addr[0]}/voice/p/${phrase}`, { 
         method: 'DELETE',
         headers: {
-          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
         }
       });
       ctx.voiceRefr[1](ctx.voiceRefr[0] + 1);
@@ -108,9 +108,9 @@ const Phrases = () => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/voice/phrases`, {
+          const res = await fetch(`https://${ctx.addr[0]}/voice/phrases`, {
             headers: {
-              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
             }
           });
           const data = await res.json();
@@ -123,7 +123,7 @@ const Phrases = () => {
     };
 
     retrievePhrases();
-  }, [ctx.addr, ctx.voiceRefr, ctx.login, ctx.password]);
+  }, [ctx.addr, ctx.voiceRefr, ctx.login, ctx.pass]);
 
   const id1 = Math.random().toString();
   const id2 = Math.random().toString();
@@ -137,7 +137,11 @@ const Phrases = () => {
     }
     else {
       try {
-        const res = await fetch(`http://${ctx.addr[0]}/voice/p/${key}`);
+        const res = await fetch(`https://${ctx.addr[0]}/voice/p/${key}`, {
+          headers: {
+            'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
+          }
+        });
         const data = await res.json();
         setPhrase(key);
         setEndpoint(data['endpoint']);
@@ -154,11 +158,11 @@ const Phrases = () => {
   const updateBind = async () => {
     if (ctx.addr[0] !== null) {
       try {
-        await fetch(`http://${ctx.addr[0]}/voice/p/${phrase}`, {
+        await fetch(`https://${ctx.addr[0]}/voice/p/${phrase}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+            'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
           },
           body: JSON.stringify({
             'endpoint': endpoint,
@@ -224,9 +228,9 @@ const Voice = () => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/voice`, {
+          const res = await fetch(`https://${ctx.addr[0]}/voice`, {
             headers: {
-              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
             }
           });
           const data = await res.text();
@@ -239,15 +243,15 @@ const Voice = () => {
     }
 
     retrieveEnabled();
-  }, [ctx.addr, ctx.login, ctx.password]);
+  }, [ctx.addr, ctx.login, ctx.pass]);
 
   const toggleVoice = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/voice`, {
+      await fetch(`https://${ctx.addr[0]}/voice`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
         },
         body: JSON.stringify({
           'state': !enabled

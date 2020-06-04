@@ -45,9 +45,9 @@ class Network:
             return
         
         self.db[group] = {
-            'local': self.conf['net']['name'],
+            'local': self.conf.name,
             'members': {
-                self.conf['net']['name']: self.conf.addr
+                self.conf.name: self.conf.addr
             }
         }
         return self.group(group)

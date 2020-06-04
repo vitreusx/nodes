@@ -21,10 +21,10 @@ const GroupContextMenu = (props) => {
 
   const leave = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/net/g/${group}/leave`, {
+      await fetch(`https://${ctx.addr[0]}/net/g/${group}/leave`, {
         method: 'POST',
         headers: {
-          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
         }
       });
     }
@@ -37,10 +37,10 @@ const GroupContextMenu = (props) => {
 
   const destroy = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/net/g/${group}`, {
+      await fetch(`https://${ctx.addr[0]}/net/g/${group}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
         }
       });
     }
@@ -75,10 +75,10 @@ const AllGroupsContextMenu = (props) => {
   const create = async e => {
     setShowCreate(false);
     try {
-      await fetch(`http://${ctx.addr[0]}/net/g/${name}`, {
+      await fetch(`https://${ctx.addr[0]}/net/g/${name}`, {
         method: 'PUT', 
         headers: {
-          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
         }
       });
     }
@@ -128,9 +128,9 @@ const Groups = () => {
       }
       else {
         try {
-          const res = await fetch(`http://${ctx.addr[0]}/net/groups`, {
+          const res = await fetch(`https://${ctx.addr[0]}/net/groups`, {
             headers: {
-              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+              'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
             }
           });
           const data = await res.json();
@@ -143,7 +143,7 @@ const Groups = () => {
     }
 
     retrieveGroups();
-  }, [ctx.addr, ctx.refresh, ctx.login, ctx.password]);
+  }, [ctx.addr, ctx.refresh, ctx.login, ctx.pass]);
 
   const id1 = Math.random().toString();
   const id2 = Math.random().toString();

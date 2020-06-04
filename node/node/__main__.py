@@ -10,5 +10,5 @@ if __name__ == '__main__':
 
     ssl_certs = (f"certs/{nx.conf['net']['name']}.crt", f"certs/{nx.conf['net']['name']}.key")
     print(ssl_certs)
-    nx.app.run(host='0.0.0.0', port=nx.conf.get('port') or 8080, threaded=True, 
+    nx.app.run(host='0.0.0.0', port=nx.conf.get('net').get('port') or 8080, threaded=True, 
                ssl_context = ssl_certs)

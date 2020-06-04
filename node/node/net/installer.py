@@ -48,7 +48,7 @@ class Installer:
             def put(self, group):
                 if not network.create(group):
                     return False
-                fetch_group(group).invite(conf['net']['name'], conf.addr)
+                fetch_group(group).invite(conf.name, conf.addr)
                 return True
             
             @nx.httpauth.login_required
