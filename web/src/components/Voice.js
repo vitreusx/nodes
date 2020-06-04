@@ -22,7 +22,7 @@ const PhraseContextMenu = (props) => {
 
   const remove = async () => {
     try {
-      await fetch(`http://${ctx.addr[0]}/voice/p/${phrase}`, { 
+      await fetch(`https://${ctx.addr[0]}/voice/p/${phrase}`, { 
         method: 'DELETE',
         headers: {
           'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
@@ -51,11 +51,11 @@ const PhrasesPanContextMenu = (props) => {
   const create = async e => {
     setShowCreate(false);
     try {
-      await fetch(`http://${ctx.addr[0]}/voice/p/${phrase}`, {
+      await fetch(`https://${ctx.addr[0]}/voice/p/${phrase}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.password[0])
+          'Authorization': 'Basic ' + btoa(ctx.login[0] + ':' + ctx.pass[0])
         },
         body: JSON.stringify({
           'endpoint': '',
