@@ -178,7 +178,7 @@ const Auth = () => {
                   <Nav.Item>
                     <Nav.Link>
                       <strong>{pend['nodeName']}</strong>
-                      ({pend['hash'].substring(0, 8)}...)
+                      ({pend['hash']})
                     </Nav.Link>
                   </Nav.Item>
                 </ContextMenuTrigger>
