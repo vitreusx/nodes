@@ -21,7 +21,7 @@ openssl \
   -reqexts SAN \
   -key "$NAME.key" \
   -out "$NAME.csr" \
-  -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP:$ADDRESS")) \
+  -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP.1:127.0.0.1,IP.2:$ADDRESS")) \
   -days 36500
 
 # sign the certificate with the certificate authority
@@ -32,7 +32,7 @@ openssl \
   -in "$NAME.csr" \
   -signkey "$NAME.key" \
   -out "$NAME.crt" \
-  -extfile <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP:$ADDRESS")) \
+  -extfile <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP.1.:127.0.0.1,IP.2:$ADDRESS")) \
   -extensions SAN \
 
 rm "$NAME.csr"
