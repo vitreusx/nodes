@@ -126,6 +126,7 @@ class CommandLineInterface():
             
     
     def do_execute(self, params):
+        ''' <command> execute command '''
         self.check_param_len(params, 1)
         return self.send_request('post', f'/voice/p/{params[0]}')
 #        requests.post(f'http://{self.target}/voice/p/{params[0]}') 
@@ -192,7 +193,7 @@ class CommandLineInterface():
             return '\n'.join(groups)
 
         elif params[0] == '-v':
-            response = self.send_request('get','/voice/phrases')
+            response = self.send_request('get','/voice/phrases')[1]
             groups = json.loads(response)
             return '\n'.join(groups)
 
@@ -214,7 +215,7 @@ class CommandLineInterface():
 
         elif params[0] == '-r':
             self.check_param_len(params[1:], 1)
-            return self.send_request('delete', f'/voice/p/{params[1]}')
+            return self.send_request('delete', f'/voice/p/{params[1]}')[0]
 
         else:
             raise ValueError('Wrong option') 
