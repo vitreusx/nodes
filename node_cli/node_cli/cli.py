@@ -116,10 +116,11 @@ class CommandLineInterface():
                 'verify': str(os.path.join('certs', f'{self.name}.crt'))
             }
             response = requests.post(f'https://127.0.0.1:{self.port}/net/proxy', json=json_dict, **auth) 
+            response_text = json.loads(response.text)[0]
             if response.status_code != 200:
                 return 'Operation Failed'
             else:
-                return ('Success', response)
+                return ('Success', response_text)
         except:
             return f'Failed to connect to target {self.target}'
             
@@ -160,7 +161,7 @@ class CommandLineInterface():
         elif params[0] == '-m':
             self.check_param_len(params[1:], 1)
             response = self.send_request('get', f'/net/g/{params[1]}')[1]
-            members = [key + ' - ' + value for key, value in json.loads(response.text).items()]
+            members = [key + ' - ' + value for key, value in json.loads(response).items()]
             return '\n'.join(members)
 
         else:
@@ -187,12 +188,12 @@ class CommandLineInterface():
 
         if len(params) == 0 or params[0] == '-g':
             response = self.send_request('get', f'/net/groups')[1]
-            groups = json.loads(response.text)
+            groups = json.loads(response)
             return '\n'.join(groups)
 
         elif params[0] == '-v':
             response = self.send_request('get','/voice/phrases')
-            groups = json.loads(response.text)
+            groups = json.loads(response)
             return '\n'.join(groups)
 
         else:
