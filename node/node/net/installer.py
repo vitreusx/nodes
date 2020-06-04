@@ -3,13 +3,13 @@ from .config import Config
 from .network import Network
 from .authorization import Authorization
 from .connecting import ConnectionHandshake
-from flask import request as req, abort, url_for
+from flask import request as req, abort, url_for, jsonify
 from flask_restful import Resource
 import requests
 import json
 
 
-request_method = {
+request_methods = {
     'get' : requests.get,
     'put' : requests.put,
     'delete' : requests.delete,
@@ -146,13 +146,18 @@ class Installer:
 
             try:
                 sender = request_methods[req.json['method']]
-            except:
+            except KeyError:
                 sender = requests.post
             
+            response = []
             for grp, mem in targets:
                 url = f'https://{network.group(grp).member(mem)}{req.json["endpoint"]}'
                 other_node_name = mem
-                sender(url, json=req.json['payload'], **nx.auth.get_requests_auth(other_node_name))
+                res = sender(url, json=req.json['payload'], **nx.auth.get_requests_auth(other_node_name))
+                response.append(res.text)
+            print(response)
+
+            return jsonify(response)
 
         # Adds authorized user on this node
         # Request contains json with username and password fields

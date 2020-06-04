@@ -35,6 +35,23 @@ curl -H "Content-Type: application/json" --insecure --user local:SKkxiqEcIipZeLL
 
 How to create trusted connection between two nodes:
 
+First go into WWW interface and create group for each node so that cli doesnt crash
+Now open cli for nodeA and type
+conn -c nodeB 127.0.0.1:8081
+
+Nodes are gonna exchange information, lets verify hashes
+conn -p
+{"conns":[{"hash":"7f86f7bf3563ec743e6e632afe7dabb747ad64ba1f38e8baba58e9362655f862","nodeName":"nodeB"}]}
+
+on nodeB should be the same
+conn -p 
+{"conns":[{"hash":"7f86f7bf3563ec743e6e632afe7dabb747ad64ba1f38e8baba58e9362655f862","nodeName":"nodeA"}]}
+
+hashes match so let's accept, do this command in both cli
+conn -a 7f86f7bf3563ec743e6e632afe7dabb747ad64ba1f38e8baba58e9362655f862
+
+
+OLD STUFF - manual curl
 First tell nodeA to connect to nodeB
 
 curl -H "Content-Type: application/json" --insecure https://127.0.0.1:8080/connect/start --data '{"name": "nodeB", "address": "127.0.0.1:8081"}' --user local:<local a pass>
