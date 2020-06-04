@@ -30,7 +30,8 @@ class CommandLineInterface():
             'list' : self.do_list, 
             'voice' : self.do_voice,
             'conn':   self.do_conn,
-            'quit': self.do_quit
+            'target': self.do_target,
+            'quit': self.do_quit,
         }
         
         def complter(text, state):
@@ -88,7 +89,7 @@ class CommandLineInterface():
         for group in groups:
             members = requests.get(f'https://127.0.0.1:{self.port}/net/g/{group}', **auth).text
             members = json.loads(members)
-            if self.name in members:
+            if node in members:
                 return group
 
         raise ValueError("Node doesn't have group") 
@@ -253,6 +254,17 @@ class CommandLineInterface():
                               'hash': accepted_hash
                           },
                           auth = ('local', self.password), verify=self.cert)
+
+     
+    def do_target(self, params):
+        ''' <node_name> set node as target for next command'''
+        self.check_param_len(params, 1)
+        target = params[0]
+        group = self.get_group(target)
+        self.target = target
+        self.group = group
+        return "Success"
+     
             
     def do_quit(self, params):
         ''' Quit program '''
