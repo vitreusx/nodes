@@ -88,7 +88,7 @@ const StartContextMenu = (props) => {
             <InputGroup.Prepend>
               <InputGroup.Text>Node Address</InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl placeholder='Node Address' value={name} onChange={e => setAddr(e.target.value)} />
+            <FormControl placeholder='Node Address' value={addr} onChange={e => setAddr(e.target.value)} />
           </InputGroup>
         </Modal.Body>
         <Modal.Footer>
@@ -178,7 +178,7 @@ const Auth = () => {
                   <Nav.Item>
                     <Nav.Link>
                       <strong>{pend['nodeName']}</strong>
-                      ({pend['hash'].substring(0, 8)}...)
+                      ({pend['hash']})
                     </Nav.Link>
                   </Nav.Item>
                 </ContextMenuTrigger>
